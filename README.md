@@ -3,26 +3,28 @@
 
 ## მაგალითი
 
-```
+```ena
 ა = 20;
 ბ = 100;
-თუ ბ < ა {
+თუ ბ != ა {
   ბ = 1
-} სხვათუ ბ > ა {
+} თუარადა ბ > ა {
   ბ = 2
-} სხვა {
+} თუარა {
   ბ = 3
 };
+მჩ ბ;
 დააბრუნე ბ;
 ```
 
 ## Todo
-- Var2num in Compiler
-- Introduce
-    - arrays
-    - functions
-    - local variables and parameters
-    - translator
+- reserved words
+- arrays
+- functions
+- local variables and parameters
+- string literals
+- unless statement
+- undefined variables
 
 ## ♥
 - Final project for the Building a Programming Language course by Roberto Ierusalimschy

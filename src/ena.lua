@@ -1,7 +1,8 @@
 #!/usr/bin/env lua
 
 local interpreter = require "interpreter"
-local compiler = require "compiler.compiler"
+local translator = require "translator"
+local compiler = require "compiler"
 
 local lpeg = require "lpeg"
 local pt = require "external.pt"
@@ -86,13 +87,28 @@ local grammar = {
     program = endToken * statementList * -1,
     statementList = statement ^ -1 * (sep.statement * statementList) ^ -1 / nodeStatementSequence,
     blockStatement = delim.openBlock * statementList * sep.statement ^ -1 * delim.closeBlock,
-    elses = (KW "elseif" + KW "სხვათუ" * comparisonExpr * blockStatement) * elses / nodeIf + (KW "else" + KW "სხვა" * blockStatement) ^ -1,
+    elses = ((KW "elseif" + KW(translator.kwords.longForm.keyElseIf) + KW(translator.kwords.shortForm.keyElseIf)) *
+        comparisonExpr *
+        blockStatement) *
+        elses /
+        nodeIf +
+        ((KW "else" + KW(translator.kwords.longForm.keyElse) + KW(translator.kwords.shortForm.keyElse)) * blockStatement) ^
+            -1,
     statement = blockStatement + -- Assignment - must be first to allow variables that contain keywords as prefixes.
         identifier * op.assign * comparisonExpr / nodeAssignment + -- If
-        KW "if" + KW "თუ" * comparisonExpr * blockStatement * elses / nodeIf + -- Return
-        KW "return" + KW "დააბრუნე" * comparisonExpr / nodeReturn + -- While
-        KW "while" + KW "როცა" * comparisonExpr * blockStatement / nodeWhile + -- Print
-        op.print * comparisonExpr / nodePrint,
+        (KW "if" + KW(translator.kwords.longForm.keyIf) + KW(translator.kwords.shortForm.keyIf)) * comparisonExpr *
+            blockStatement *
+            elses /
+            nodeIf + -- Return
+        (KW "return" + KW(translator.kwords.longForm.keyReturn) + KW(translator.kwords.shortForm.keyReturn)) *
+            comparisonExpr /
+            nodeReturn + -- While
+        (KW "while" + KW(translator.kwords.longForm.keyWhile) + KW(translator.kwords.shortForm.keyWhile)) *
+            comparisonExpr *
+            blockStatement /
+            nodeWhile + -- Print
+        (op.print + KW(translator.kwords.longForm.keyPrint) + KW(translator.kwords.shortForm.keyPrint)) * comparisonExpr /
+            nodePrint,
     -- Identifiers and numbers
     primary = numeral / nodeNumeral + identifier / nodeVariable + -- Sentences in the language enclosed in parentheses
         delim.openFactor * comparisonExpr * delim.closeFactor,
@@ -118,7 +134,7 @@ for index, argument in ipairs(arg) do
     if awaiting_filename then
         local status, err = pcall(io.input, arg[index])
         if not status then
-            print('Could not open file "' .. arg[index] .. '"\n\tError: ' .. err)
+            io.stderr:write("Could not open file" .. " | " .. translator.err.fileOpen .. ": " .. arg[index] .. '"\n\tError: ' .. err .. "\n")
             os.exit(1)
         end
         awaiting_filename = false
@@ -134,14 +150,16 @@ for index, argument in ipairs(arg) do
         show.result = true
     elseif argument:lower() == "--pegdebug" or argument:lower() == "-p" then
         show.pegdebug = true
+    elseif argument:lower() == "--translate" or argument:lower() == "-tr" then
+        show.translate = true
     else
-        print("Unknown argument " .. argument .. ".")
+        io.stderr:write("Unknown argument" .. " | " .. translator.err.unknownArg .. ": " .. argument .. "." .. "\n")
         os.exit(1)
     end
 end
 
 if awaiting_filename then
-    print "Specified -i, but no input file found."
+    io.stderr:write(show.translate and translator.err.noInputFile .. "\n" or "Specified -i, but no input file found." .. "\n")
     os.exit(1)
 end
 
@@ -166,9 +184,19 @@ if not ast then
         if input:sub(furthestMatch - 1, furthestMatch - 1) == "\r" then
             furthestMatch = furthestMatch - 1
         end
-        io.stderr:write("syntax error after line ", errorLine, "\n")
+        io.stderr:write(
+            show.translate and translator.err.syntaxErrAfterLine or "syntax error after line",
+            " ",
+            errorLine,
+            "\n"
+        )
     else
-        io.stderr:write("syntax error at line ", errorLine, "\n")
+        io.stderr:write(
+            show.translate and translator.err.syntaxErrAtLine or "syntax error at line",
+            " ",
+            errorLine,
+            "\n"
+        )
     end
     io.stderr:write(
         string.sub(input, furthestMatch - 20, furthestMatch - 1),
@@ -180,34 +208,30 @@ if not ast then
 end
 
 if show.AST then
-    print(pt.pt(ast))
+    print((show.translate and translator.success.showAST or "AST") .. ":" .. pt.pt(ast))
 end
 
 -- compile --
-local code = compiler.compile(ast)
+local code = compiler.compile(ast, show.translate)
 if code == nil then
-    print "\nFailed generate code from input:"
-    print(input)
-    print "\nAST:"
-    print(pt.pt(ast))
+    io.stderr:write("Failed generate code from input:", "\n", input, "\nAST:", "\n", pt.pt(ast), "\n")
     return 1
 end
 
 if show.code then
-    print "\nGenerated code:"
-    print(pt.pt(code))
+    print((show.translate and translator.success.showCode or "Generated code") .. ":" ..  pt.pt(code))
 end
 
 -- execute --
 local trace = {}
 local result = interpreter.run(code, trace)
 if show.trace then
-    print "\nExecution trace:"
+    print((show.translate and translator.success.showTrace or "Execution trace") .. ":")
     for k, v in ipairs(trace) do
         print(k, v)
     end
 end
 if show.result then
-    print "\nResult:"
+    print((show.translate and translator.success.showResult or "Result") .. ":")
     print(result)
 end

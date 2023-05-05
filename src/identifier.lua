@@ -1,11 +1,12 @@
 local lpeg = require "lpeg"
 local tokens = require "tokens"
+local translator = require "translator"
 local endToken = require("common").endToken
 
 local R, S = lpeg.R, lpeg.S
 local Cmt = lpeg.Cmt
 
-local geoalpha = S("აბგდევზთიკლმნოპჟრსტუფქღყშჩცძწჭხჯჰ")
+local geoalpha = S(translator.alphabet)
 local alpha = R("AZ", "az") + geoalpha
 local identifierStartCharacters = (alpha + "_")
 local digit = R "09"

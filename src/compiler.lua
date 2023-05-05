@@ -1,11 +1,13 @@
 local module = {}
 local literals = require "literals"
+local translator = require "translator"
 local op = literals.op
 
 local Compiler = {
     code = {},
     variables = {},
-    nvars = 0
+    nvars = 0,
+    translate = false
 }
 
 function Compiler:currentInstructionIndex()
@@ -33,10 +35,10 @@ function Compiler:fixupJump(location)
     self.code[location] = self:currentInstructionIndex() - location
 end
 
-function Compiler:addCode (opcode)
+function Compiler:addCode(opcode)
     local code = self.code
     code[#code + 1] = opcode
-  end
+end
 
 function Compiler:variableToNumber(variable)
     local number = self.variables[variable]
@@ -54,7 +56,7 @@ function Compiler:codeExpression(ast)
         self:addCode(ast.value)
     elseif ast.tag == "variable" then
         if self.variables[ast.value] == nil then
-            error('Trying to load from undefined variable "' .. ast.value .. '."')
+            error((Compiler.translate and translator.err.undefinedVariable or 'Trying to load from undefined variablex') .. ' "' .. ast.value .. '."')
         end
         self:addCode("load")
         self:addCode(self:variableToNumber(ast.value))
@@ -134,10 +136,11 @@ function Compiler:codeStatement(ast)
     end
 end
 
-function module.compile(ast)
+function module.compile(ast, translate)
     Compiler.code = {}
     Compiler.variables = {}
     Compiler.nvars = 0
+    Compiler.translate = translate
     Compiler:codeStatement(ast)
     Compiler:addCode("push")
     Compiler:addCode(0)
