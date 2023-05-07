@@ -18,6 +18,8 @@ function module.KW(keyword)
 end
 
 -- Delimiters
+module.delim.openArray = T(l.delim.openArray)
+module.delim.closeArray = T(l.delim.closeArray)
 module.delim.openFactor = T(l.delim.openFactor)
 module.delim.closeFactor = T(l.delim.closeFactor)
 module.delim.openBlock = T(l.delim.openBlock)
@@ -35,7 +37,7 @@ module.op.comparison =
     (C(l.op.greaterOrEqual) + C(l.op.greater) + C(l.op.lessOrEqual) + C(l.op.less) + C(l.op.equal) + C(l.op.notEqual))
 )
 module.op.unarySign = T(C(P(l.op.positive) + l.op.negate))
-module.op.unaryNot = T(C(l.op.unaryNot))
+module.op.not_ = T(C(l.op.not_))
 module.op.print = T(l.op.print)
 module.op.logical = T(C(l.op.and_) + C(l.op.or_))
 

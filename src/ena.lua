@@ -27,12 +27,13 @@ local function node(tag, ...)
 end
 
 local nodeVariable = node("variable", "value")
-local nodeAssignment = node("assignment", "identifier", "assignment")
+local nodeAssignment = node("assignment", "writeTarget", "assignment")
 local nodePrint = node("print", "toPrint")
 local nodeReturn = node("return", "sentence")
 local nodeNumeral = node("number", "value")
 local nodeIf = node("if", "expression", "block", "elseBlock")
 local nodeWhile = node("while", "expression", "block")
+local nodeNewArray = node("newArray", "sizes", "initialValueExpression")
 
 local function nodeStatementSequence(first, rest)
     -- When first is empty, rest is nil, so we return an empty statement.
@@ -72,6 +73,14 @@ local function foldBinaryOps(list)
     return tree
 end
 
+local function foldArrayElement(list)
+    local tree = list[1]
+    for i = 2, #list do
+        tree = {tag = "arrayElement", array = tree, index = list[i]}
+    end
+    return tree
+end
+
 -- grammar --
 local V = lpeg.V
 local primary, exponentExpr, termExpr = V "primary", V "exponentExpr", V "termExpr"
@@ -80,6 +89,9 @@ local notExpr = V "notExpr"
 local statement, statementList = V "statement", V "statementList"
 local elses = V "elses"
 local blockStatement = V "blockStatement"
+local expression = V "expression"
+local variable = V "variable"
+local writeTarget = V "writeTarget" -- left-hand side
 
 local Ct = lpeg.Ct
 local grammar = {
@@ -88,38 +100,43 @@ local grammar = {
     statementList = statement ^ -1 * (sep.statement * statementList) ^ -1 / nodeStatementSequence,
     blockStatement = delim.openBlock * statementList * sep.statement ^ -1 * delim.closeBlock,
     elses = ((KW "elseif" + KW(translator.kwords.longForm.keyElseIf) + KW(translator.kwords.shortForm.keyElseIf)) *
-        comparisonExpr *
+        expression *
         blockStatement) *
         elses /
         nodeIf +
         ((KW "else" + KW(translator.kwords.longForm.keyElse) + KW(translator.kwords.shortForm.keyElse)) * blockStatement) ^
             -1,
+    variable = identifier / nodeVariable,
+    writeTarget = Ct(variable * (delim.openArray * expression * delim.closeArray) ^ 0) / foldArrayElement,
     statement = blockStatement + -- Assignment - must be first to allow variables that contain keywords as prefixes.
-        identifier * op.assign * comparisonExpr / nodeAssignment + -- If
-        (KW "if" + KW(translator.kwords.longForm.keyIf) + KW(translator.kwords.shortForm.keyIf)) * comparisonExpr *
+        writeTarget * op.assign * expression * -delim.openBlock / nodeAssignment + -- If
+        (KW "if" + KW(translator.kwords.longForm.keyIf) + KW(translator.kwords.shortForm.keyIf)) * expression *
             blockStatement *
             elses /
             nodeIf + -- Return
         (KW "return" + KW(translator.kwords.longForm.keyReturn) + KW(translator.kwords.shortForm.keyReturn)) *
-            comparisonExpr /
+            expression /
             nodeReturn + -- While
-        (KW "while" + KW(translator.kwords.longForm.keyWhile) + KW(translator.kwords.shortForm.keyWhile)) *
-            comparisonExpr *
+        (KW "while" + KW(translator.kwords.longForm.keyWhile) + KW(translator.kwords.shortForm.keyWhile)) * expression *
             blockStatement /
             nodeWhile + -- Print
-        (op.print + KW(translator.kwords.longForm.keyPrint) + KW(translator.kwords.shortForm.keyPrint)) * comparisonExpr /
+        (op.print + KW(translator.kwords.longForm.keyPrint) + KW(translator.kwords.shortForm.keyPrint)) * expression /
             nodePrint,
     -- Identifiers and numbers
-    primary = numeral / nodeNumeral + identifier / nodeVariable + -- Sentences in the language enclosed in parentheses
-        delim.openFactor * comparisonExpr * delim.closeFactor,
+    primary = Ct(KW "new" * (delim.openArray * expression * delim.closeArray) ^ 1) * primary / nodeNewArray +
+        writeTarget +
+        numeral / nodeNumeral +
+        -- Sentences in the language enclosed in parentheses
+        delim.openFactor * expression * delim.closeFactor,
     -- From highest to lowest precedence
     exponentExpr = primary * (op.exponent * exponentExpr) ^ -1 / addExponentOp,
     unaryExpr = op.unarySign * unaryExpr / addUnaryOp + exponentExpr,
     termExpr = Ct(unaryExpr * (op.term * unaryExpr) ^ 0) / foldBinaryOps,
     sumExpr = Ct(termExpr * (op.sum * termExpr) ^ 0) / foldBinaryOps,
-    notExpr = op.unaryNot * notExpr / addUnaryOp + sumExpr,
-    logicExpr = Ct(notExpr * (op.logical * notExpr) ^ 0) / foldBinaryOps,
-    comparisonExpr = Ct(logicExpr * (op.comparison * logicExpr) ^ 0) / foldBinaryOps,
+    notExpr = op.not_ * notExpr / addUnaryOp + sumExpr,
+    comparisonExpr = Ct(notExpr * (op.comparison * notExpr) ^ 0) / foldBinaryOps,
+    logicExpr = Ct(comparisonExpr * (op.logical * comparisonExpr) ^ 0) / foldBinaryOps,
+    expression = logicExpr,
     endToken = common.endTokenPattern
 }
 
@@ -128,13 +145,28 @@ local function parse(input)
     return grammar:match(input)
 end
 
+if arg[1] ~= nil and (string.lower(arg[1]) == "--tests") then
+    arg[1] = nil
+    local lu = require "luaunit"
+    testEna = require("spec.ena"):init(parse, compiler, interpreter)
+    testNumerals = require("spec.numeral")
+    testIdentifiers = require("spec.identifier")
+
+    grammar = lpeg.P(grammar)
+
+    os.exit(lu.LuaUnit.run())
+end
+
 local show = {}
 local awaiting_filename = false
 for index, argument in ipairs(arg) do
     if awaiting_filename then
         local status, err = pcall(io.input, arg[index])
         if not status then
-            io.stderr:write("Could not open file" .. " | " .. translator.err.fileOpen .. ": " .. arg[index] .. '"\n\tError: ' .. err .. "\n")
+            io.stderr:write(
+                "Could not open file" ..
+                    " | " .. translator.err.fileOpen .. ": " .. arg[index] .. '"\n\tError: ' .. err .. "\n"
+            )
             os.exit(1)
         end
         awaiting_filename = false
@@ -159,7 +191,9 @@ for index, argument in ipairs(arg) do
 end
 
 if awaiting_filename then
-    io.stderr:write(show.translate and translator.err.noInputFile .. "\n" or "Specified -i, but no input file found." .. "\n")
+    io.stderr:write(
+        show.translate and translator.err.noInputFile .. "\n" or "Specified -i, but no input file found." .. "\n"
+    )
     os.exit(1)
 end
 
@@ -219,7 +253,7 @@ if code == nil then
 end
 
 if show.code then
-    print((show.translate and translator.success.showCode or "Generated code") .. ":" ..  pt.pt(code))
+    print((show.translate and translator.success.showCode or "Generated code") .. ":" .. pt.pt(code))
 end
 
 -- execute --

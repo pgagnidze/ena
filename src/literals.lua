@@ -1,9 +1,10 @@
 local module = {op = {}, delim = {}, sep = {}, comments = {}}
 
--- language literals --
+--  operators
+module.op.assign = "=" -- Assign is a special case. It's a statement operator.
+module.op.print = "@" -- Same with print.
 
--- operators
-module.op.assign = "="
+-- binary operators
 module.op.add = "+"
 module.op.subtract = "-"
 module.op.multiply = "*"
@@ -16,45 +17,28 @@ module.op.lessOrEqual = "<="
 module.op.greaterOrEqual = ">="
 module.op.equal = "="
 module.op.notEqual = "!="
-module.op.print = "@"
-module.op.positive = "+"
-module.op.negate = "-"
-module.op.unaryNot = "!"
 module.op.and_ = "&"
 module.op.or_ = "|"
 
--- comments
+-- unary operators
+module.op.not_ = "!"
+module.op.positive = "+"
+module.op.negate = "-"
+
+--  comments
 module.comments.startLine = "#"
 module.comments.openBlock = "#{"
 module.comments.closeBlock = "#}"
 
--- delimiters
+--  delimiters
+module.delim.openArray = "["
+module.delim.closeArray = "]"
 module.delim.openFactor = "("
 module.delim.closeFactor = ")"
 module.delim.openBlock = "{"
 module.delim.closeBlock = "}"
 
--- separators
+--  separators
 module.sep.statement = ";"
-
-module.op.toName = {
-    [module.op.add] = "add",
-    [module.op.subtract] = "subtract",
-    [module.op.multiply] = "multiply",
-    [module.op.divide] = "divide",
-    [module.op.modulus] = "modulus",
-    [module.op.exponent] = "exponent",
-    [module.op.less] = "less",
-    [module.op.greater] = "greater",
-    [module.op.lessOrEqual] = "lessOrEqual",
-    [module.op.greaterOrEqual] = "greaterOrEqual",
-    [module.op.equal] = "equal",
-    [module.op.notEqual] = "notEqual"
-}
-
-module.op.unaryToName = {
-    [module.op.negate] = "negate",
-    [module.op.unaryNot] = "not"
-}
 
 return module

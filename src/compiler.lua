@@ -1,13 +1,30 @@
 local module = {}
-local literals = require "literals"
 local translator = require "translator"
-local op = literals.op
+local lop = require("literals").op
 
-local Compiler = {
-    code = {},
-    variables = {},
-    nvars = 0,
-    translate = false
+local Compiler = {}
+
+local toName = {
+    [lop.add] = "add",
+    [lop.subtract] = "subtract",
+    [lop.multiply] = "multiply",
+    [lop.divide] = "divide",
+    [lop.modulus] = "modulus",
+    [lop.exponent] = "exponent",
+    [lop.less] = "less",
+    [lop.greater] = "greater",
+    [lop.lessOrEqual] = "lessOrEqual",
+    [lop.greaterOrEqual] = "greaterOrEqual",
+    [lop.equal] = "equal",
+    [lop.notEqual] = "notEqual",
+    [lop.not_] = "not",
+    [lop.and_] = "and",
+    [lop.or_] = "or"
+}
+
+local unaryToName = {
+    [lop.negate] = "negate",
+    [lop.not_] = "not"
 }
 
 function Compiler:currentInstructionIndex()
@@ -36,8 +53,7 @@ function Compiler:fixupJump(location)
 end
 
 function Compiler:addCode(opcode)
-    local code = self.code
-    code[#code + 1] = opcode
+    self.code[#self.code + 1] = opcode
 end
 
 function Compiler:variableToNumber(variable)
@@ -56,33 +72,62 @@ function Compiler:codeExpression(ast)
         self:addCode(ast.value)
     elseif ast.tag == "variable" then
         if self.variables[ast.value] == nil then
-            error((Compiler.translate and translator.err.undefinedVariable or 'Trying to load from undefined variablex') .. ' "' .. ast.value .. '."')
+            error(
+                (Compiler.translate and translator.err.undefinedVariable or "Trying to load from undefined variable") ..
+                    ' "' .. ast.value .. '"'
+            )
         end
         self:addCode("load")
         self:addCode(self:variableToNumber(ast.value))
+    elseif ast.tag == "arrayElement" then
+        self:codeExpression(ast.array)
+        self:codeExpression(ast.index)
+        self:addCode("getArray")
+    elseif ast.tag == "newArray" then
+        self:codeExpression(ast.initialValueExpression)
+        for _, sizeExpression in ipairs(ast.sizes) do
+            self:codeExpression(sizeExpression)
+            self:addCode("newArray")
+        end
     elseif ast.tag == "binaryOp" then
-        if ast.op == literals.op.and_ then
+        if ast.op == lop.and_ then
             self:codeExpression(ast.firstChild)
-            local fixupSSAnd = self:addJump("jumpIfZeroJumpNoPop")
+            local fixupSSAnd = self:addJump("jumpIfFalseJumpNoPop")
             self:codeExpression(ast.secondChild)
             self:fixupJump(fixupSSAnd)
-        elseif ast.op == literals.op.or_ then
+        elseif ast.op == lop.or_ then
             self:codeExpression(ast.firstChild)
-            local fixupSSOr = self:addJump("jumpIfNonzeroJumpNoPop")
+            local fixupSSOr = self:addJump("jumpIfTrueJumpNoPop")
             self:codeExpression(ast.secondChild)
             self:fixupJump(fixupSSOr)
         else
             self:codeExpression(ast.firstChild)
             self:codeExpression(ast.secondChild)
-            self:addCode(op.toName[ast.op])
+            self:addCode(toName[ast.op])
         end
     elseif ast.tag == "unaryOp" then
         self:codeExpression(ast.child)
         if ast.op ~= "+" then
-            self:addCode(op.unaryToName[ast.op])
+            self:addCode(unaryToName[ast.op])
         end
     else
         error "invalid tree"
+    end
+end
+
+function Compiler:codeAssignment(ast)
+    local writeTarget = ast.writeTarget
+    if writeTarget.tag == "variable" then
+        self:codeExpression(ast.assignment)
+        self:addCode("store")
+        self:addCode(self:variableToNumber(ast.writeTarget.value))
+    elseif writeTarget.tag == "arrayElement" then
+        self:codeExpression(ast.writeTarget.array)
+        self:codeExpression(ast.writeTarget.index)
+        self:codeExpression(ast.assignment)
+        self:addCode("setArray")
+    else
+        error "Unknown assignment write target!"
     end
 end
 
@@ -96,13 +141,11 @@ function Compiler:codeStatement(ast)
         self:codeExpression(ast.sentence)
         self:addCode("return")
     elseif ast.tag == "assignment" then
-        self:codeExpression(ast.assignment)
-        self:addCode("store")
-        self:addCode(self:variableToNumber(ast.identifier))
+        self:codeAssignment(ast)
     elseif ast.tag == "if" then
         -- Expression and jump
         self:codeExpression(ast.expression)
-        local skipIfFixup = self:addJump("jumpIfZero")
+        local skipIfFixup = self:addJump("jumpIfFalse")
         -- Inside of if
         self:codeStatement(ast.block)
         if ast.elseBlock then
@@ -124,7 +167,7 @@ function Compiler:codeStatement(ast)
     elseif ast.tag == "while" then
         local whileStart = self:currentInstructionIndex()
         self:codeExpression(ast.expression)
-        local skipWhileFixup = self:addJump "jumpIfZero"
+        local skipWhileFixup = self:addJump "jumpIfFalse"
         self:codeStatement(ast.block)
         self:addJump("jump", whileStart)
         self:fixupJump(skipWhileFixup)
@@ -142,9 +185,11 @@ function module.compile(ast, translate)
     Compiler.nvars = 0
     Compiler.translate = translate
     Compiler:codeStatement(ast)
-    Compiler:addCode("push")
-    Compiler:addCode(0)
-    Compiler:addCode("return")
+    if Compiler.code[#Compiler.code] ~= "return" then
+        Compiler:addCode("push")
+        Compiler:addCode(0)
+        Compiler:addCode("return")
+    end
     return Compiler.code
 end
 

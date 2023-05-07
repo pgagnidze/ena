@@ -1,31 +1,33 @@
 local lpeg = require "lpeg"
-local endToken = require("common").endToken
 
+-- Patterns
 local P, R, S = lpeg.P, lpeg.R, lpeg.S
+-- Captures
 local C, Cc = lpeg.C, lpeg.Cc
+
+local endToken = require("common").endToken
 
 local sign = S("+-") * endToken
 -- Digits may be separated by single spaces for digit grouping purposes, so allow optional spaces.
-local decimalDigit = R "09" * P " " ^ -1
-local numeralExponent = S "eE" * sign ^ -1 * decimalDigit ^ 1
+local decimalStart = R "19"
+local decimalDigit = R "09"
+local numeralExponent = S "eE" * sign ^ -1 * (P " " ^ -1 * decimalDigit) ^ 0
 
 -- An optional (decimal point followed by zero or more decimal digits).
-local fractionOptional = ("." * decimalDigit ^ 0) ^ -1
+local fractionOptional = ("." * (P " " ^ -1 * decimalDigit) ^ 0) ^ -1
 -- A required decimal point followed by at least one decimal digit.
-local fraction = ("." * decimalDigit ^ 1)
+local fraction = ("." * (P " " ^ -1 * decimalDigit) ^ 1)
 
 -- Matches a positive nonzero numeral.
-local decimalStart = R "19" * P " " ^ -1
-local naturalNumber = decimalStart * decimalDigit ^ 0
+local naturalNumber = decimalStart * (P " " ^ -1 * decimalDigit) ^ 0
 
-local digitZero = P "0" * P " " ^ -1
 -- A decimal number is a natural number followed by an optional fractional part, followed by an optional exponent, OR
 local decimalNumeral =
     Cc(nil) *
     C(
         (naturalNumber * fractionOptional * numeralExponent ^ -1) +
             -- A zero followed by an optional fractional part, followed by an optional exponent, OR
-            (digitZero * fractionOptional * numeralExponent ^ -1) +
+            (P "0" * fractionOptional * numeralExponent ^ -1) +
             -- A fractional part followed by an optional exponent.
             fraction * numeralExponent ^ -1
     )

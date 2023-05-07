@@ -19,12 +19,14 @@
 
 ## Todo
 - reserved words
-- arrays
 - functions
 - local variables and parameters
 - string literals
 - unless statement
 - undefined variables
+- translate arrays and err messages
+- add array tests
+- add --help to cli
 
 ## ♥
 - Final project for the Building a Programming Language course by Roberto Ierusalimschy

@@ -1,9 +1,9 @@
 local lu = require "luaunit"
 local module = {}
 
-function module:init(parse, toStackVM, interpreter)
+function module:init(parse, compiler, interpreter)
     module.parse = parse
-    module.toStackVM = toStackVM
+    module.compiler = compiler
     module.interpreter = interpreter
     return module
 end
@@ -13,7 +13,7 @@ function module:testAssignmentAndParentheses()
     local ast = module.parse(input)
     local expected = {
         tag = "assignment",
-        identifier = "i",
+        writeTarget = {tag="variable", value="i"},
         assignment = {
             tag = "binaryOp",
             firstChild = {
@@ -66,7 +66,7 @@ function module:testAssignmentAndReturn()
         tag = "statementSequence",
         firstChild = {
             tag = "assignment",
-            identifier = "i",
+            writeTarget = {tag="variable", value="i"},
             assignment = {
                 tag = "binaryOp",
                 firstChild = {
@@ -132,7 +132,7 @@ function module.testStackedUnaryOperators()
     local ast = module.parse(input)
     local expected = {
         tag = "assignment",
-        identifier = "i",
+        writeTarget = {tag="variable", value="i"},
         assignment = {
             tag = "binaryOp",
             firstChild = {
@@ -170,7 +170,7 @@ function module.testUnaryOperators()
     local ast = module.parse(input)
     local expected = {
         tag = "assignment",
-        identifier = "i",
+        writeTarget = {tag="variable", value="i"},
         assignment = {
             tag = "binaryOp",
             firstChild = {
@@ -196,7 +196,7 @@ function module.testEmptyStatementsLeadingTrailing()
     local ast = module.parse(input)
     local expected = {
         tag = "assignment",
-        identifier = "i",
+        writeTarget = {tag="variable", value="i"},
         assignment = {
             tag = "binaryOp",
             firstChild = {
@@ -220,7 +220,7 @@ function module.testEmptyStatementsInterspersed()
         tag = "statementSequence",
         firstChild = {
             tag = "assignment",
-            identifier = "i",
+            writeTarget = {tag="variable", value="i"},
             assignment = {
                 tag = "binaryOp",
                 firstChild = {
@@ -270,7 +270,7 @@ function module.testComplexSequenceResult()
             "z value = x value * y value % 12;" .. "z value = y value ^ x value + z value;" .. "return z value;"
 
     local ast = module.parse(input)
-    local code = module.toStackVM.translate(ast)
+    local code = module.compiler.compile(ast)
     local result = module.interpreter.run(code)
     lu.assertEquals(result, 139314069504)
 end
@@ -280,7 +280,7 @@ function module.testExponentPrecedence()
     local ast = module.parse(input)
     local expected = {
         tag = "assignment",
-        identifier = "i",
+        writeTarget = {tag="variable", value="i"},
         assignment = {
             tag = "binaryOp",
             firstChild = {
@@ -336,7 +336,7 @@ return c;
         tag = "statementSequence",
         firstChild = {
             tag = "assignment",
-            identifier = "a",
+            writeTarget = {tag="variable", value="a"},
             assignment = {
                 tag = "binaryOp",
                 firstChild = {
@@ -354,7 +354,7 @@ return c;
             tag = "statementSequence",
             firstChild = {
                 tag = "assignment",
-                identifier = "b",
+                writeTarget = {tag="variable", value="b"},
                 assignment = {
                     tag = "binaryOp",
                     firstChild = {
@@ -380,7 +380,7 @@ return c;
                 tag = "statementSequence",
                 firstChild = {
                     tag = "assignment",
-                    identifier = "c",
+                    writeTarget = {tag="variable", value="c"},
                     assignment = {
                         tag = "binaryOp",
                         firstChild = {
@@ -428,7 +428,7 @@ function module.testKeywordExcludeRules()
             tag = "statementSequence",
             firstChild = {
                 tag = "assignment",
-                identifier = "delta x",
+                writeTarget = {tag="variable", value="delta x"},
                 assignment = {
                     tag = "number",
                     value = 1
@@ -449,7 +449,7 @@ function module.testKeywordExcludeRules()
             tag = "statementSequence",
             firstChild = {
                 tag = "assignment",
-                identifier = "return of the variable",
+                writeTarget = {tag="variable", value="return of the variable"},
                 assignment = {
                     tag = "number",
                     value = 1
@@ -480,7 +480,7 @@ c = (b + 10)/a;
 return c;
 ]]
     local ast = module.parse(input)
-    local code = module.toStackVM.translate(ast)
+    local code = module.compiler.compile(ast)
     local result = module.interpreter.run(code)
     lu.assertEquals(result, 14)
 end
@@ -490,7 +490,7 @@ function module.testLessonFourCornerCases()
         module.parse "returned = 10",
         {
             tag = "assignment",
-            identifier = "returned",
+            writeTarget = {tag="variable", value="returned"},
             assignment = {
                 tag = "number",
                 value = 10
@@ -528,7 +528,7 @@ function module.testLessonFourCornerCases()
             tag = "statementSequence",
             firstChild = {
                 tag = "assignment",
-                identifier = "x",
+                writeTarget = {tag="variable", value="x"},
                 assignment = {
                     tag = "number",
                     value = 1
@@ -553,7 +553,7 @@ function module.testLessonFourCornerCases()
             tag = "statementSequence",
             firstChild = {
                 tag = "assignment",
-                identifier = "x",
+                writeTarget = {tag="variable", value="x"},
                 assignment = {
                     tag = "number",
                     value = 10
@@ -576,7 +576,7 @@ function module.testLessonFourCornerCases()
         ]]),
         {
             tag = "assignment",
-            identifier = "x",
+            writeTarget = {tag="variable", value="x"},
             assignment = {
                 tag = "number",
                 value = 10
@@ -601,7 +601,7 @@ function module.testNot()
             }
         }
     )
-    local code = module.toStackVM.translate(ast)
+    local code = module.compiler.compile(ast)
     lu.assertEquals(module.interpreter.run(code), 0)
 
     local ast = module.parse("return ! ! 167")
@@ -623,7 +623,7 @@ function module.testNot()
             }
         }
     )
-    local code = module.toStackVM.translate(ast)
+    local code = module.compiler.compile(ast)
     lu.assertEquals(module.interpreter.run(code), 1)
 
     local ast = module.parse("return!!!12412.435")
@@ -649,7 +649,7 @@ function module.testNot()
             }
         }
     )
-    local code = module.toStackVM.translate(ast)
+    local code = module.compiler.compile(ast)
     lu.assertEquals(module.interpreter.run(code), 0)
 end
 
@@ -672,7 +672,7 @@ return c;
             tag = "statementSequence",
             firstChild = {
                 tag = "assignment",
-                identifier = "a",
+                writeTarget = {tag="variable", value="a"},
                 assignment = {
                     tag = "binaryOp",
                     firstChild = {
@@ -690,7 +690,7 @@ return c;
                 tag = "statementSequence",
                 firstChild = {
                     tag = "assignment",
-                    identifier = "b",
+                    writeTarget = {tag="variable", value="b"},
                     assignment = {
                         tag = "binaryOp",
                         firstChild = {
@@ -720,7 +720,7 @@ return c;
                     tag = "statementSequence",
                     firstChild = {
                         tag = "assignment",
-                        identifier = "c",
+                        writeTarget = {tag="variable", value="c"},
                         assignment = {
                             tag = "binaryOp",
                             firstChild = {
@@ -754,7 +754,7 @@ return c;
                                 tag = "statementSequence",
                                 firstChild = {
                                     tag = "assignment",
-                                    identifier = "this is a long name",
+                                    writeTarget = {tag="variable", value="this is a long name"},
                                     assignment = {
                                         tag = "number",
                                         value = 24
@@ -762,7 +762,7 @@ return c;
                                 },
                                 secondChild = {
                                     tag = "assignment",
-                                    identifier = "c",
+                                    writeTarget = {tag="variable", value="c"},
                                     assignment = {
                                         tag = "number",
                                         value = 12
@@ -782,7 +782,7 @@ return c;
             }
         }
     )
-    local code = module.toStackVM.translate(ast)
+    local code = module.compiler.compile(ast)
     lu.assertEquals(module.interpreter.run(code), 12)
 end
 
@@ -797,7 +797,7 @@ return b;
 ]]
 
     local ast = module.parse(ifOnlyYes)
-    local code = module.toStackVM.translate(ast)
+    local code = module.compiler.compile(ast)
     lu.assertEquals(module.interpreter.run(code), 1)
 
     local ifOnlyNo = [[
@@ -810,7 +810,7 @@ return b;
   ]]
 
     ast = module.parse(ifOnlyNo)
-    code = module.toStackVM.translate(ast)
+    code = module.compiler.compile(ast)
     lu.assertEquals(module.interpreter.run(code), 100)
 
     local ifElseYes = [[
@@ -825,7 +825,7 @@ return b;
 ]]
 
     ast = module.parse(ifElseYes)
-    code = module.toStackVM.translate(ast)
+    code = module.compiler.compile(ast)
     lu.assertEquals(module.interpreter.run(code), 1)
 
     local ifElseNo = [[
@@ -840,7 +840,7 @@ return b;
   ]]
 
     ast = module.parse(ifElseNo)
-    code = module.toStackVM.translate(ast)
+    code = module.compiler.compile(ast)
     lu.assertEquals(module.interpreter.run(code), 2)
 
     local ifElseIfYes = [[
@@ -855,7 +855,7 @@ return b;
 ]]
 
     ast = module.parse(ifElseIfYes)
-    code = module.toStackVM.translate(ast)
+    code = module.compiler.compile(ast)
     lu.assertEquals(module.interpreter.run(code), 1)
 
     local ifElseIfNo = [[
@@ -870,7 +870,7 @@ return b;
   ]]
 
     ast = module.parse(ifElseIfNo)
-    code = module.toStackVM.translate(ast)
+    code = module.compiler.compile(ast)
     lu.assertEquals(module.interpreter.run(code), 2)
 
     local ifElseIfNeither = [[
@@ -885,7 +885,7 @@ return b;
 ]]
 
     ast = module.parse(ifElseIfNeither)
-    code = module.toStackVM.translate(ast)
+    code = module.compiler.compile(ast)
     lu.assertEquals(module.interpreter.run(code), 20)
     local firstClause = [[
 a = 20;
@@ -900,7 +900,7 @@ if b < a {
 return b;
 ]]
     ast = module.parse(firstClause)
-    code = module.toStackVM.translate(ast)
+    code = module.compiler.compile(ast)
     lu.assertEquals(module.interpreter.run(code), 1)
 
     local secondClause =
@@ -917,7 +917,7 @@ if b < a {
 return b;
 ]]
     ast = module.parse(secondClause)
-    code = module.toStackVM.translate(ast)
+    code = module.compiler.compile(ast)
     lu.assertEquals(module.interpreter.run(code), 2)
     local thirdClause = [[
 a = 20;
@@ -933,7 +933,7 @@ return b;
   ]]
 
     ast = module.parse(thirdClause)
-    code = module.toStackVM.translate(ast)
+    code = module.compiler.compile(ast)
     lu.assertEquals(module.interpreter.run(code), 3)
 
     local empty = [[
@@ -947,7 +947,7 @@ return b;
   ]]
 
     ast = module.parse(empty)
-    code = module.toStackVM.translate(ast)
+    code = module.compiler.compile(ast)
     lu.assertEquals(module.interpreter.run(code), 20)
 end
 
