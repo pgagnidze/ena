@@ -47,10 +47,11 @@ local function copyObjectNoSelfReferences(object)
     return result
 end
 
-local function printValue(array, depth, pad, last)
+local function printValue(array, depth, pad, last, visited)
+    visited = visited or {}
     if pad == nil then
         pad = calculatePad(array)
-        printValue(array, depth, pad, last)
+        printValue(array, depth, pad, last, visited)
         return
     end
 
@@ -59,22 +60,30 @@ local function printValue(array, depth, pad, last)
         return
     end
 
+    -- Check if the table has already been visited
+    if visited[array] then
+        io.write("<selfrefer>")
+        return
+    end
+
+    visited[array] = true
+
     depth = depth or 0
     if depth > 0 then
-        io.write "\n"
+        io.write("\n")
     end
     io.write((" "):rep(depth) .. "[")
 
     for i = 1, #array - 1 do
-        printValue(array[i], depth + 1, pad)
-        io.write ","
+        printValue(array[i], depth + 1, pad, false, visited)
+        io.write(",")
         if type(array[i]) ~= "table" then
-            io.write " "
+            io.write(" ")
         end
     end
-    printValue(array[#array], depth + 1, pad, true)
+    printValue(array[#array], depth + 1, pad, true, visited)
 
-    io.write "]"
+    io.write("]")
 
     if last then
         io.write("\n" .. (" "):rep(depth - 1))

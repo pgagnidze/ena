@@ -147,14 +147,15 @@ end
 
 if arg[1] ~= nil and (string.lower(arg[1]) == "--tests") then
     arg[1] = nil
-    local lu = require "luaunit"
-    testEna = require("spec.ena"):init(parse, compiler, interpreter)
-    testNumerals = require("spec.numeral")
-    testIdentifiers = require("spec.identifier")
+    _G.lu = require "luaunit"
+    _G.testEna = require("spec.ena"):init(parse, compiler, interpreter)
+    _G.testNumerals = require("spec.numeral")
+    _G.testIdentifiers = require("spec.identifier")
+    _G.grammar = grammar
 
     grammar = lpeg.P(grammar)
 
-    os.exit(lu.LuaUnit.run())
+    os.exit(_G.lu.LuaUnit.run())
 end
 
 local show = {}
