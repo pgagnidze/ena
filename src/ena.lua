@@ -145,7 +145,25 @@ local function parse(input)
     return grammar:match(input)
 end
 
-if arg[1] ~= nil and (string.lower(arg[1]) == "--tests") then
+if arg[1] ~= nil and (string.lower(arg[1]) == "--help" or string.lower(arg[1]) == "-h") then
+    -- If the first argument is nil, then the user has not provided a filename.
+    -- So provide all the options and usage information.
+    io.stdout:write("Usage: " .. arg[0] .. " -i [filename] [options]\n\n")
+    io.stdout:write("Ena, the first Georgian programming language.\n\n")
+    io.stdout:write("Options:\n")
+    io.stdout:write("\t--help\t\t-h\t\tShow this help message.\n")
+    io.stdout:write("\t--tests\t\t-ts\t\tRun the test suite.\n")
+    io.stdout:write("\t--input\t\t-i\t\tSpecify the input file.\n")
+    io.stdout:write("\t--ast\t\t-a\t\tShow abstract syntax tree.\n")
+    io.stdout:write("\t--code\t\t-c\t\tShow generated code.\n")
+    io.stdout:write("\t--trace\t\t-t\t\tTrace the program.\n")
+    io.stdout:write("\t--result\t-r\t\tShow the result.\n")
+    io.stdout:write("\t--pegdebug\t-p\t\tRun the PEG debugger.\n")
+    io.stdout:write("\t--translate\t-tr\t\tTranslate messages to Georgian.\n")
+    os.exit(0)
+end
+
+if arg[1] ~= nil and (string.lower(arg[1]) == "--tests" or string.lower(arg[1]) == "-ts") then
     arg[1] = nil
     _G.lu = require "luaunit"
     _G.testEna = require("spec.ena"):init(parse, compiler, interpreter)

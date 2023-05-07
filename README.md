@@ -28,7 +28,6 @@
 - add array tests
   - print infinite loop when self-reference
   - frontend ast test for multidim arrays
-- add --help to cli
 
 ## ♥
 - Final project for the Building a Programming Language course by Roberto Ierusalimschy
