@@ -42,19 +42,6 @@ function common.clearFurthestMatch()
     furthestMatch = 0
 end
 
-function common.lines(string, include_newlines)
-    -- Add a extra newline at the end of the string so that the final line will have a newline.
-    -- If we don't do this, the last line will not be output by our matches.
-    if string:sub(#string, #string) ~= "\n" then
-        string = string .. "\n"
-    end
-    if include_newlines then
-        return string:gmatch("[^\r\n]*[\r]?[\n]")
-    else
-        return string:gmatch("([^\r\n]*)[\r]?[\n]")
-    end
-end
-
 -- Counts the number of occurrences of substring in string
 function common.count(substring, string)
     local matches = 0
