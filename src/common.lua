@@ -42,6 +42,17 @@ function common.clearFurthestMatch()
     furthestMatch = 0
 end
 
+function common.copyObjectNoSelfReferences(object)
+    if type(object) ~= "table" then
+        return object
+    end
+    local result = {}
+    for k, v in pairs(object) do
+        result[common.copyObjectNoSelfReferences(k)] = common.copyObjectNoSelfReferences(v)
+    end
+    return result
+end
+
 -- Counts the number of occurrences of substring in string
 function common.count(substring, string)
     local matches = 0

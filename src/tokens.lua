@@ -24,6 +24,8 @@ module.delim.openFactor = T(l.delim.openFactor)
 module.delim.closeFactor = T(l.delim.closeFactor)
 module.delim.openBlock = T(l.delim.openBlock)
 module.delim.closeBlock = T(l.delim.closeBlock)
+module.delim.openFunctionParameterList = T(l.delim.openFunctionParameterList)
+module.delim.closeFunctionParameterList = T(l.delim.closeFunctionParameterList)
 
 -- Separators
 module.sep.statement = T(l.sep.statement)

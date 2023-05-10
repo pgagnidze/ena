@@ -1,8 +1,33 @@
 local module = {}
 local translator = require "translator"
 local lop = require("literals").op
+local literals = require "literals"
 
-local Compiler = {}
+local Compiler = {
+    functions = {},
+    variables = {},
+    nvars = 0
+}
+
+local function pt(x, id, visited)
+    visited = visited or {}
+    id = id or ""
+    if type(x) == "string" then
+        return "'" .. tostring(x) .. "'"
+    elseif type(x) ~= "table" then
+        return tostring(x)
+    elseif visited[x] then
+        return "..."
+    else
+        visited[x] = true
+        local s = id .. "{\n"
+        for k, v in pairs(x) do
+            s = s .. id .. tostring(k) .. " = " .. pt(v, id .. "  ", visited) .. ";\n"
+        end
+        s = s .. id .. "}"
+        return s
+    end
+end
 
 local toName = {
     [lop.add] = "add",
@@ -66,6 +91,16 @@ function Compiler:variableToNumber(variable)
     return number
 end
 
+function Compiler:codeFunctionCall(ast)
+    local func = self.functions[ast.name]
+    if not func then
+        error('Undefined function "' .. ast.name .. '()."')
+    else
+        self:addCode("callFunction")
+        self:addCode(func.code)
+    end
+end
+
 function Compiler:codeExpression(ast)
     if ast.tag == "number" then
         self:addCode("push")
@@ -73,12 +108,15 @@ function Compiler:codeExpression(ast)
     elseif ast.tag == "variable" then
         if self.variables[ast.value] == nil then
             error(
-                (Compiler.translate and translator.err.compileErrUndefinedVariable or "Trying to load from undefined variable") ..
+                (Compiler.translate and translator.err.compileErrUndefinedVariable or
+                    "Trying to load from undefined variable") ..
                     ' "' .. ast.value .. '"'
             )
         end
         self:addCode("load")
         self:addCode(self:variableToNumber(ast.value))
+    elseif ast.tag == "functionCall" then
+        self:codeFunctionCall(ast)
     elseif ast.tag == "arrayElement" then
         self:codeExpression(ast.array)
         self:codeExpression(ast.index)
@@ -86,7 +124,7 @@ function Compiler:codeExpression(ast)
     elseif ast.tag == "newArray" then
         self:codeExpression(ast.initialValue)
         self:codeExpression(ast.size)
-        self:addCode('newArray')
+        self:addCode("newArray")
     elseif ast.tag == "binaryOp" then
         if ast.op == lop.and_ then
             self:codeExpression(ast.firstChild)
@@ -109,13 +147,16 @@ function Compiler:codeExpression(ast)
             self:addCode(unaryToName[ast.op])
         end
     else
-        error "invalid tree"
+        error('Unknown expression node tag "' .. ast.tag .. '."')
     end
 end
 
 function Compiler:codeAssignment(ast)
     local writeTarget = ast.writeTarget
     if writeTarget.tag == "variable" then
+        if self.functions[ast.writeTarget.value] then
+            error('Assigning to variable "'..ast.writeTarget.value..'" with the same name as a function.')
+        end
         self:codeExpression(ast.assignment)
         self:addCode("store")
         self:addCode(self:variableToNumber(ast.writeTarget.value))
@@ -125,7 +166,7 @@ function Compiler:codeAssignment(ast)
         self:codeExpression(ast.assignment)
         self:addCode("setArray")
     else
-        error "Unknown assignment write target!"
+        error('Unknown write target type, tag was "'..tostring(ast.tag)..'."')
     end
 end
 
@@ -138,6 +179,11 @@ function Compiler:codeStatement(ast)
     elseif ast.tag == "return" then
         self:codeExpression(ast.sentence)
         self:addCode("return")
+    elseif ast.tag == "functionCall" then
+        self:codeFunctionCall(ast)
+        -- Discard return value for function statements, since it's not used by anything.
+        self:addCode("pop")
+        self:addCode(1)
     elseif ast.tag == "assignment" then
         self:codeAssignment(ast)
     elseif ast.tag == "if" then
@@ -173,22 +219,44 @@ function Compiler:codeStatement(ast)
         self:codeExpression(ast.toPrint)
         self:addCode("print")
     else
-        error "invalid tree"
+        error('Unknown statement node tag "' .. ast.tag .. '."')
     end
 end
 
-function module.compile(ast, translate)
-    Compiler.code = {}
-    Compiler.variables = {}
-    Compiler.nvars = 0
-    Compiler.translate = translate
-    Compiler:codeStatement(ast)
-    if Compiler.code[#Compiler.code] ~= "return" then
-        Compiler:addCode("push")
-        Compiler:addCode(0)
-        Compiler:addCode("return")
+
+function Compiler:codeFunction(ast)
+    if not ast.body then
+        self.functions[ast.name] = { code = {}, forwardDeclaration = true }
+      return
     end
-    return Compiler.code
+  
+    if self.functions[ast.name] ~= nil and not self.functions[ast.name].forwardDeclaration then
+        error("Duplicate function name")
+    end
+  
+    local functionCode = self.functions[ast.name] and self.functions[ast.name].code or {}
+    self.functions[ast.name] = { code = functionCode }
+    self.code = functionCode
+    self:codeStatement(ast.body)
+    if functionCode[#functionCode] ~= 'return' then
+      self:addCode('push')
+      self:addCode(0)
+      self:addCode('return')
+    end
+  end
+
+function module.compile(ast, translate)
+    Compiler.translate = translate
+
+    for i = 1, #ast do
+        Compiler:codeFunction(ast[i])
+    end
+
+    local entryPoint = Compiler.functions[literals.entryPointName]
+    if not entryPoint then
+        error("No entrypoint found")
+    end
+    return entryPoint.code
 end
 
 return module

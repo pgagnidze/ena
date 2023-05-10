@@ -20,4 +20,4 @@ local function getIdentifier(subject, position, match)
     end
 end
 
-return Cmt(identifierStartCharacters * (S " -" ^ -1 * identifierTailCharacters) ^ 0, getIdentifier) * endToken
+return Cmt(identifierStartCharacters * (S "-" ^ -1 * identifierTailCharacters) ^ 0, getIdentifier) * endToken

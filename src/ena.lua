@@ -9,7 +9,7 @@ local pt = require "external.pt"
 local common = require "common"
 local endToken = common.endToken
 local numeral = require "numeral"
-local identifier = require "identifier"
+local identifierPattern = require 'identifier'
 
 local tokens = require "tokens"
 local op = tokens.op
@@ -33,6 +33,8 @@ local nodeReturn = node("return", "sentence")
 local nodeNumeral = node("number", "value")
 local nodeIf = node("if", "expression", "block", "elseBlock")
 local nodeWhile = node("while", "expression", "block")
+local nodeFunction = node("function", "name", "body")
+local nodeFunctionCall = node("functionCall", "name")
 
 local function nodeStatementSequence(first, rest)
     -- When first is empty, rest is nil, so we return an empty statement.
@@ -99,12 +101,16 @@ local elses = V "elses"
 local blockStatement = V "blockStatement"
 local expression = V "expression"
 local variable = V "variable"
+local identifier = V'identifier'
 local writeTarget = V "writeTarget" -- left-hand side
+local funcDec = lpeg.V"funcDec"
+local functionCall = lpeg.V"functionCall"
 
 local Ct = lpeg.Ct
 local grammar = {
     "program",
-    program = endToken * statementList * -1,
+    program = endToken * Ct(funcDec^1) * -1,
+    funcDec = KW'function' * identifier * delim.openFunctionParameterList * delim.closeFunctionParameterList * (blockStatement + sep.statement) / nodeFunction,
     statementList = statement ^ -1 * (sep.statement * statementList) ^ -1 / nodeStatementSequence,
     blockStatement = delim.openBlock * statementList * sep.statement ^ -1 * delim.closeBlock,
     elses = ((KW "elseif" + KW(translator.kwords.longForm.keyElseIf) + KW(translator.kwords.shortForm.keyElseIf)) *
@@ -115,8 +121,10 @@ local grammar = {
         ((KW "else" + KW(translator.kwords.longForm.keyElse) + KW(translator.kwords.shortForm.keyElse)) * blockStatement) ^
             -1,
     variable = identifier / nodeVariable,
+    functionCall = identifier * delim.openFunctionParameterList * delim.closeFunctionParameterList / nodeFunctionCall,
     writeTarget = Ct(variable * (delim.openArray * expression * delim.closeArray) ^ 0) / foldArrayElement,
-    statement = blockStatement + -- Assignment - must be first to allow variables that contain keywords as prefixes.
+    statement = blockStatement +
+        functionCall +
         writeTarget * op.assign * expression * -delim.openBlock / nodeAssignment + -- If
         (KW "if" + KW(translator.kwords.longForm.keyIf) + KW(translator.kwords.shortForm.keyIf)) * expression *
             blockStatement *
@@ -137,6 +145,7 @@ local grammar = {
     ) *
         primary /
         foldNewArray +
+        functionCall +
         writeTarget +
         numeral / nodeNumeral +
         -- Sentences in the language enclosed in parentheses
@@ -150,10 +159,12 @@ local grammar = {
     comparisonExpr = Ct(notExpr * (op.comparison * notExpr) ^ 0) / foldBinaryOps,
     logicExpr = Ct(comparisonExpr * (op.logical * comparisonExpr) ^ 0) / foldBinaryOps,
     expression = logicExpr,
-    endToken = common.endTokenPattern
+    endToken = common.endTokenPattern,
+    identifier = identifierPattern
 }
 
 local function parse(input)
+    grammar = lpeg.P(grammar)
     common.clearFurthestMatch()
     return grammar:match(input)
 end
@@ -238,7 +249,6 @@ Enter the code here and press Ctrl+D to run it.
 if show.pegdebug then
     grammar = require("external.pegdebug").trace(grammar)
 end
-grammar = lpeg.P(grammar)
 
 -- parse user input
 local input = io.read "a"
@@ -306,11 +316,19 @@ end
 
 -- execute --
 local trace = {}
-local result = interpreter.run(code, trace, show.translate)
+local result = interpreter.execute(code, trace, show.translate)
 if show.trace then
     io.stdout:write((show.translate and translator.success.showTrace or "Execution trace") .. ":\n")
     for k, v in ipairs(trace) do
         print(k, v)
+        if trace.stack[k] then
+            for i = #trace.stack[k],1,-1 do
+              print('\t\t\t' .. tostring(trace.stack[k][i]))
+            end
+            if #trace.stack[k] == 0 then
+              print '\t\t\t(empty)'
+            end
+          end
     end
     io.stdout:write("\n")
 end

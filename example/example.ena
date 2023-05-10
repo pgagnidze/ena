@@ -1,3 +1,14 @@
-a = ახალი [3][3] 3;
-a[1] = a;
-@ a[1][2]
+function b();
+
+function a () {
+    return b()
+}
+
+function b () {
+    return 1 + a()
+}
+
+function entrypoint () {
+    a ();
+    return 1
+}
