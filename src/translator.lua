@@ -23,6 +23,9 @@ module.kwords.shortForm.keyWhile = "სნ"
 module.kwords.longForm.keyPrint = "მაჩვენე"
 module.kwords.shortForm.keyPrint = "მჩ"
 
+module.kwords.longForm.keyNew = "ახალი"
+module.kwords.shortForm.keyNew = "ახ"
+
 -- error messages --
 module.err.unknownArg = "უცნობი არგუმენტი"
 module.err.noInputFile = "ფაილი ვერ მოიძებნა"

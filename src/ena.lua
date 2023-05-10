@@ -123,7 +123,12 @@ local grammar = {
         (op.print + KW(translator.kwords.longForm.keyPrint) + KW(translator.kwords.shortForm.keyPrint)) * expression /
             nodePrint,
     -- Identifiers and numbers
-    primary = Ct(KW "new" * (delim.openArray * expression * delim.closeArray) ^ 1) * primary / nodeNewArray +
+    primary = Ct(
+        (KW "new" + KW(translator.kwords.longForm.keyNew) + KW(translator.kwords.shortForm.keyNew)) *
+            (delim.openArray * expression * delim.closeArray) ^ 1
+    ) *
+        primary /
+        nodeNewArray +
         writeTarget +
         numeral / nodeNumeral +
         -- Sentences in the language enclosed in parentheses
@@ -216,6 +221,11 @@ if awaiting_filename then
     os.exit(1)
 end
 
+print([[
+ენა - Ena, the first Georgian programming language.
+Enter the code here and press Ctrl+D to run it.
+]])
+
 -- peg debug
 if show.pegdebug then
     grammar = require("external.pegdebug").trace(grammar)
@@ -267,12 +277,23 @@ end
 -- compile --
 local code = compiler.compile(ast, show.translate)
 if code == nil then
-    io.stderr:write((show.translate and translator.err.codeError or  "Failed generate code from input"), ":\n", input, "\nAST:", "\n", pt.pt(ast), "\n")
+    io.stderr:write(
+        (show.translate and translator.err.codeError or "Failed generate code from input"),
+        ":\n",
+        input,
+        "\nAST:",
+        "\n",
+        pt.pt(ast),
+        "\n"
+    )
     return 1
 end
 
 if show.code then
-    io.stdout:write((show.translate and translator.success.showCode or "Generated code") .. ":\n" .. pt.pt(code), "\n\n")
+    io.stdout:write(
+        (show.translate and translator.success.showCode or "Generated code") .. ":\n" .. pt.pt(code),
+        "\n\n"
+    )
 end
 
 -- execute --

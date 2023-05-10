@@ -24,7 +24,6 @@
 - string literals
 - unless statement
 - undefined variables
-- translate arrays and err messages
 - add array tests
   - print infinite loop when self-reference
   - frontend ast test for multidim arrays
