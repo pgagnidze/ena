@@ -9,7 +9,7 @@ local pt = require "external.pt"
 local common = require "common"
 local endToken = common.endToken
 local numeral = require "numeral"
-local identifierPattern = require 'identifier'
+local identifierPattern = require "identifier"
 
 local tokens = require "tokens"
 local op = tokens.op
@@ -101,16 +101,18 @@ local elses = V "elses"
 local blockStatement = V "blockStatement"
 local expression = V "expression"
 local variable = V "variable"
-local identifier = V'identifier'
+local identifier = V "identifier"
 local writeTarget = V "writeTarget" -- left-hand side
-local funcDec = lpeg.V"funcDec"
-local functionCall = lpeg.V"functionCall"
+local funcDec = lpeg.V "funcDec"
+local functionCall = lpeg.V "functionCall"
 
 local Ct = lpeg.Ct
 local grammar = {
     "program",
-    program = endToken * Ct(funcDec^1) * -1,
-    funcDec = KW'function' * identifier * delim.openFunctionParameterList * delim.closeFunctionParameterList * (blockStatement + sep.statement) / nodeFunction,
+    program = endToken * Ct(funcDec ^ 1) * -1,
+    funcDec = KW "function" * identifier * delim.openFunctionParameterList * delim.closeFunctionParameterList *
+        (blockStatement + sep.statement) /
+        nodeFunction,
     statementList = statement ^ -1 * (sep.statement * statementList) ^ -1 / nodeStatementSequence,
     blockStatement = delim.openBlock * statementList * sep.statement ^ -1 * delim.closeBlock,
     elses = ((KW "elseif" + KW(translator.kwords.longForm.keyElseIf) + KW(translator.kwords.shortForm.keyElseIf)) *
@@ -123,9 +125,7 @@ local grammar = {
     variable = identifier / nodeVariable,
     functionCall = identifier * delim.openFunctionParameterList * delim.closeFunctionParameterList / nodeFunctionCall,
     writeTarget = Ct(variable * (delim.openArray * expression * delim.closeArray) ^ 0) / foldArrayElement,
-    statement = blockStatement +
-        functionCall +
-        writeTarget * op.assign * expression * -delim.openBlock / nodeAssignment + -- If
+    statement = blockStatement + functionCall + writeTarget * op.assign * expression * -delim.openBlock / nodeAssignment + -- If
         (KW "if" + KW(translator.kwords.longForm.keyIf) + KW(translator.kwords.shortForm.keyIf)) * expression *
             blockStatement *
             elses /
@@ -322,13 +322,13 @@ if show.trace then
     for k, v in ipairs(trace) do
         print(k, v)
         if trace.stack[k] then
-            for i = #trace.stack[k],1,-1 do
-              print('\t\t\t' .. tostring(trace.stack[k][i]))
+            for i = #trace.stack[k], 1, -1 do
+                print("\t\t\t" .. tostring(trace.stack[k][i]))
             end
             if #trace.stack[k] == 0 then
-              print '\t\t\t(empty)'
+                print "\t\t\t(empty)"
             end
-          end
+        end
     end
     io.stdout:write("\n")
 end

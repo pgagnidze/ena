@@ -155,7 +155,7 @@ function Compiler:codeAssignment(ast)
     local writeTarget = ast.writeTarget
     if writeTarget.tag == "variable" then
         if self.functions[ast.writeTarget.value] then
-            error('Assigning to variable "'..ast.writeTarget.value..'" with the same name as a function.')
+            error('Assigning to variable "' .. ast.writeTarget.value .. '" with the same name as a function.')
         end
         self:codeExpression(ast.assignment)
         self:addCode("store")
@@ -166,7 +166,7 @@ function Compiler:codeAssignment(ast)
         self:codeExpression(ast.assignment)
         self:addCode("setArray")
     else
-        error('Unknown write target type, tag was "'..tostring(ast.tag)..'."')
+        error('Unknown write target type, tag was "' .. tostring(ast.tag) .. '."')
     end
 end
 
@@ -223,27 +223,26 @@ function Compiler:codeStatement(ast)
     end
 end
 
-
 function Compiler:codeFunction(ast)
     if not ast.body then
-        self.functions[ast.name] = { code = {}, forwardDeclaration = true }
-      return
+        self.functions[ast.name] = {code = {}, forwardDeclaration = true}
+        return
     end
-  
+
     if self.functions[ast.name] ~= nil and not self.functions[ast.name].forwardDeclaration then
         error("Duplicate function name")
     end
-  
+
     local functionCode = self.functions[ast.name] and self.functions[ast.name].code or {}
-    self.functions[ast.name] = { code = functionCode }
+    self.functions[ast.name] = {code = functionCode}
     self.code = functionCode
     self:codeStatement(ast.body)
-    if functionCode[#functionCode] ~= 'return' then
-      self:addCode('push')
-      self:addCode(0)
-      self:addCode('return')
+    if functionCode[#functionCode] ~= "return" then
+        self:addCode("push")
+        self:addCode(0)
+        self:addCode("return")
     end
-  end
+end
 
 function module.compile(ast, translate)
     Compiler.translate = translate
