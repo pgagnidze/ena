@@ -2,11 +2,21 @@ local module = {}
 local translator = require "translator"
 local common = require("common")
 
-local Interpreter = {
-    stack = {},
-    memory = {},
-    top = 0
-}
+local Interpreter = {}
+
+function Interpreter:new(o)
+    o =
+        o or
+        {
+            errors = {},
+            stack = {},
+            top = 0,
+            memory = {}
+        }
+    self.__index = self
+    setmetatable(o, self)
+    return o
+end
 
 local function calculatePad(array)
     return 0
@@ -213,12 +223,11 @@ function Interpreter:run(code)
 
             if index > array.size or index < 1 then
                 error(
-                    (Interpreter.translate and translator.err.runtimeErrOutOfRangeFirst or "Out of range. Array is size") ..
+                    (self.translate and translator.err.runtimeErrOutOfRangeFirst or "Out of range. Array is size") ..
                         " " ..
                             array.size ..
                                 " " ..
-                                    (Interpreter.translate and translator.err.runtimeErrOutOfRangeSecond or
-                                        "but indexed at") ..
+                                    (self.translate and translator.err.runtimeErrOutOfRangeSecond or "but indexed at") ..
                                         " " .. index .. "."
                 )
             end
@@ -242,12 +251,11 @@ function Interpreter:run(code)
 
             if index > array.size or index < 1 then
                 error(
-                    (Interpreter.translate and translator.err.runtimeErrOutOfRangeFirst or "Out of range. Array is size") ..
+                    (self.translate and translator.err.runtimeErrOutOfRangeFirst or "Out of range. Array is size") ..
                         " " ..
                             array.size ..
                                 " " ..
-                                    (Interpreter.translate and translator.err.runtimeErrOutOfRangeSecond or
-                                        "but indexed at") ..
+                                    (self.translate and translator.err.runtimeErrOutOfRangeSecond or "but indexed at") ..
                                         " " .. index .. "."
                 )
             end
@@ -310,10 +318,11 @@ function Interpreter:execute(code)
 end
 
 function module.execute(code, trace, translate)
+    local interpreter = Interpreter:new()
     trace.stack = {}
-    Interpreter.trace = trace
-    Interpreter.translate = translate
-    return Interpreter:execute(code)
+    interpreter.trace = trace
+    interpreter.translate = translate
+    return interpreter:execute(code)
 end
 
 return module

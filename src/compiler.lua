@@ -3,11 +3,7 @@ local translator = require "translator"
 local lop = require("literals").op
 local literals = require "literals"
 
-local Compiler = {
-    functions = {},
-    variables = {},
-    nvars = 0
-}
+local Compiler = {}
 
 local toName = {
     [lop.add] = "add",
@@ -31,6 +27,19 @@ local unaryToName = {
     [lop.negate] = "negate",
     [lop.not_] = "not"
 }
+
+function Compiler:new(o)
+    o =
+        o or
+        {
+            functions = {},
+            variables = {},
+            nvars = 0
+        }
+    self.__index = self
+    setmetatable(o, self)
+    return o
+end
 
 function Compiler:currentInstructionIndex()
     return #self.code
@@ -88,7 +97,7 @@ function Compiler:codeExpression(ast)
     elseif ast.tag == "variable" then
         if self.variables[ast.value] == nil then
             error(
-                (Compiler.translate and translator.err.compileErrUndefinedVariable or
+                (self.translate and translator.err.compileErrUndefinedVariable or
                     "Trying to load from undefined variable") ..
                     ' "' .. ast.value .. '"'
             )
@@ -204,19 +213,19 @@ function Compiler:codeStatement(ast)
 end
 
 function Compiler:codeFunction(ast)
-    if not ast.body then
-        self.functions[ast.name] = {code = {}, forwardDeclaration = true}
-        return
-    end
-
-    if self.functions[ast.name] ~= nil and not self.functions[ast.name].forwardDeclaration then
-        error("Duplicate function name")
+    if not ast.block then
+        if not self.functions[ast.name] then
+            self.functions[ast.name] = {code = {}, forwardDeclaration = true}
+        end
     end
 
     local functionCode = self.functions[ast.name] and self.functions[ast.name].code or {}
+    if #functionCode > 0 and not self.functions[ast.name].forwardDeclaration then
+        error("Duplicate function name " .. ast.name)
+    end
     self.functions[ast.name] = {code = functionCode}
     self.code = functionCode
-    self:codeStatement(ast.body)
+    self:codeStatement(ast.block)
     if functionCode[#functionCode] ~= "return" then
         self:addCode("push")
         self:addCode(0)
@@ -224,18 +233,22 @@ function Compiler:codeFunction(ast)
     end
 end
 
-function module.compile(ast, translate)
-    Compiler.translate = translate
-
+function Compiler:compile(ast)
     for i = 1, #ast do
-        Compiler:codeFunction(ast[i])
+        self:codeFunction(ast[i])
     end
 
-    local entryPoint = Compiler.functions[literals.entryPointName]
+    local entryPoint = self.functions[literals.entryPointName]
     if not entryPoint then
         error("No entrypoint found")
     end
     return entryPoint.code
+end
+
+function module.compile(ast, translate)
+    local compiler = Compiler:new()
+    compiler.translate = translate
+    return compiler:compile(ast)
 end
 
 return module

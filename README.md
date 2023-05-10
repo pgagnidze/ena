@@ -18,16 +18,11 @@
 ```
 
 ## Todo
-- reserved words
 - local variables and parameters
 - string literals
 - unless statement
 - undefined variables
-- update broken tests (functions)
 - translate functions
-- add array tests
-  - print infinite loop when self-reference
-  - frontend ast test for multidim arrays
 
 ## ♥
 - Final project for the Building a Programming Language course by Roberto Ierusalimschy

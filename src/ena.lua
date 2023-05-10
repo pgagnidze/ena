@@ -33,7 +33,7 @@ local nodeReturn = node("return", "sentence")
 local nodeNumeral = node("number", "value")
 local nodeIf = node("if", "expression", "block", "elseBlock")
 local nodeWhile = node("while", "expression", "block")
-local nodeFunction = node("function", "name", "body")
+local nodeFunction = node("function", "name", "block")
 local nodeFunctionCall = node("functionCall", "name")
 
 local function nodeStatementSequence(first, rest)
@@ -85,7 +85,7 @@ end
 local function foldNewArray(list, initialValue)
     local tree = initialValue
     -- Reverse order, so that the leaf nodes are first in the AST.
-    for i = #list, 1, -2 do
+    for i = #list, 1, -1 do
         tree = {tag = "newArray", initialValue = tree, size = list[i]}
     end
     return tree
