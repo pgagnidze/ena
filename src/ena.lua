@@ -240,10 +240,12 @@ if awaiting_filename then
     os.exit(1)
 end
 
-print([[
+if arg[1] == nil then
+    print([[
 ენა - Ena, the first Georgian programming language.
 Enter the code here and press Ctrl+D to run it.
-]])
+    ]])
+end
 
 -- peg debug
 if show.pegdebug then
