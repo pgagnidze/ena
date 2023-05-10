@@ -84,11 +84,9 @@ function Compiler:codeExpression(ast)
         self:codeExpression(ast.index)
         self:addCode("getArray")
     elseif ast.tag == "newArray" then
-        self:codeExpression(ast.initialValueExpression)
-        for _, sizeExpression in ipairs(ast.sizes) do
-            self:codeExpression(sizeExpression)
-            self:addCode("newArray")
-        end
+        self:codeExpression(ast.initialValue)
+        self:codeExpression(ast.size)
+        self:addCode('newArray')
     elseif ast.tag == "binaryOp" then
         if ast.op == lop.and_ then
             self:codeExpression(ast.firstChild)

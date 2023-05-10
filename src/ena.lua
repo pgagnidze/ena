@@ -33,7 +33,6 @@ local nodeReturn = node("return", "sentence")
 local nodeNumeral = node("number", "value")
 local nodeIf = node("if", "expression", "block", "elseBlock")
 local nodeWhile = node("while", "expression", "block")
-local nodeNewArray = node("newArray", "sizes", "initialValueExpression")
 
 local function nodeStatementSequence(first, rest)
     -- When first is empty, rest is nil, so we return an empty statement.
@@ -77,6 +76,15 @@ local function foldArrayElement(list)
     local tree = list[1]
     for i = 2, #list do
         tree = {tag = "arrayElement", array = tree, index = list[i]}
+    end
+    return tree
+end
+
+local function foldNewArray(list, initialValue)
+    local tree = initialValue
+    -- Reverse order, so that the leaf nodes are first in the AST.
+    for i = #list, 1, -2 do
+        tree = {tag = "newArray", initialValue = tree, size = list[i]}
     end
     return tree
 end
@@ -128,7 +136,7 @@ local grammar = {
             (delim.openArray * expression * delim.closeArray) ^ 1
     ) *
         primary /
-        nodeNewArray +
+        foldNewArray +
         writeTarget +
         numeral / nodeNumeral +
         -- Sentences in the language enclosed in parentheses
