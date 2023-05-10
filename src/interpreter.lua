@@ -1,4 +1,7 @@
+local translator = require "translator"
+
 local module = {}
+local Interpreter = {}
 
 local function traceUnaryOp(trace, operator, value)
     if trace then
@@ -90,9 +93,10 @@ local function printValue(array, depth, pad, last, visited)
     end
 end
 
-function module.run(code, trace)
+function module.run(code, trace, translate)
     local stack = {}
     local memory = {}
+    Interpreter.translate = translate
     local pc = 1
     local top = 0
     while pc <= #code do
@@ -202,7 +206,15 @@ function module.run(code, trace)
             traceCustom(trace, code[pc] .. " " .. "[" .. index .. "] = " .. tostring(value))
 
             if index > array.size or index < 1 then
-                error("Out of range. Array is size " .. array.size .. " but indexed at " .. index .. ".")
+                error(
+                    (Interpreter.translate and translator.err.runtimeErrOutOfRangeFirst or "Out of range. Array is size") ..
+                        " " ..
+                            array.size ..
+                                " " ..
+                                    (Interpreter.translate and translator.err.runtimeErrOutOfRangeSecond or
+                                        "but indexed at") ..
+                                        " " .. index .. "."
+                )
             end
 
             -- Set the array to this value
@@ -223,7 +235,15 @@ function module.run(code, trace)
             top = popStack(stack, top, 1)
 
             if index > array.size or index < 1 then
-                error("Out of range. Array is size " .. array.size .. " but indexed at " .. index .. ".")
+                error(
+                    (Interpreter.translate and translator.err.runtimeErrOutOfRangeFirst or "Out of range. Array is size") ..
+                        " " ..
+                            array.size ..
+                                " " ..
+                                    (Interpreter.translate and translator.err.runtimeErrOutOfRangeSecond or
+                                        "but indexed at") ..
+                                        " " .. index .. "."
+                )
             end
 
             -- Set the top of the stack to the value of this index of the array.
@@ -269,7 +289,7 @@ function module.run(code, trace)
             top = popStack(stack, top, 1)
             return returnValue
         else
-            error "unknown instruction"
+            error("unknown instruction " .. code[pc] .. " at " .. pc)
         end
         pc = pc + 1
     end

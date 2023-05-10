@@ -149,7 +149,7 @@ if arg[1] ~= nil and (string.lower(arg[1]) == "--help" or string.lower(arg[1]) =
     -- If the first argument is nil, then the user has not provided a filename.
     -- So provide all the options and usage information.
     io.stdout:write("Usage: " .. arg[0] .. " -i [filename] [options]\n\n")
-    io.stdout:write("Ena, the first Georgian programming language.\n\n")
+    io.stdout:write("ენა - Ena, the first Georgian programming language.\n\n")
     io.stdout:write("Options:\n")
     io.stdout:write("\t--help\t\t-h\t\tShow this help message.\n")
     io.stdout:write("\t--tests\t\t-ts\t\tRun the test suite.\n")
@@ -261,30 +261,30 @@ if not ast then
 end
 
 if show.AST then
-    print((show.translate and translator.success.showAST or "AST") .. ":" .. pt.pt(ast))
+    io.stdout:write((show.translate and translator.success.showAST or "AST") .. ":\n" .. pt.pt(ast), "\n\n")
 end
 
 -- compile --
 local code = compiler.compile(ast, show.translate)
 if code == nil then
-    io.stderr:write("Failed generate code from input:", "\n", input, "\nAST:", "\n", pt.pt(ast), "\n")
+    io.stderr:write((show.translate and translator.err.codeError or  "Failed generate code from input"), ":\n", input, "\nAST:", "\n", pt.pt(ast), "\n")
     return 1
 end
 
 if show.code then
-    print((show.translate and translator.success.showCode or "Generated code") .. ":" .. pt.pt(code))
+    io.stdout:write((show.translate and translator.success.showCode or "Generated code") .. ":\n" .. pt.pt(code), "\n\n")
 end
 
 -- execute --
 local trace = {}
-local result = interpreter.run(code, trace)
+local result = interpreter.run(code, trace, show.translate)
 if show.trace then
-    print((show.translate and translator.success.showTrace or "Execution trace") .. ":")
+    io.stdout:write((show.translate and translator.success.showTrace or "Execution trace") .. ":\n")
     for k, v in ipairs(trace) do
         print(k, v)
     end
+    io.stdout:write("\n")
 end
 if show.result then
-    print((show.translate and translator.success.showResult or "Result") .. ":")
-    print(result)
+    io.stdout:write((show.translate and translator.success.showResult or "Result") .. ":\n", result, "\n\n")
 end

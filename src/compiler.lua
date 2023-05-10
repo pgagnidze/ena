@@ -73,7 +73,7 @@ function Compiler:codeExpression(ast)
     elseif ast.tag == "variable" then
         if self.variables[ast.value] == nil then
             error(
-                (Compiler.translate and translator.err.undefinedVariable or "Trying to load from undefined variable") ..
+                (Compiler.translate and translator.err.compileErrUndefinedVariable or "Trying to load from undefined variable") ..
                     ' "' .. ast.value .. '"'
             )
         end

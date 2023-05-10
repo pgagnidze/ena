@@ -29,7 +29,10 @@ module.err.noInputFile = "ფაილი ვერ მოიძებნა"
 module.err.fileOpen = "ფაილი ვერ გაიხსნა"
 module.err.syntaxErrAfterLine = "სინტაქსური შეცდომა ამ ხაზის შემდეგ"
 module.err.syntaxErrAtLine = "სინტაქსური შეცდომა ამ ხაზზე"
-module.err.undefinedVariable = "ცვლადი არაა განსაზღვრული"
+module.err.compileErrUndefinedVariable = "ცვლადი არაა განსაზღვრული"
+module.err.runtimeErrOutOfRangeFirst = "მასივის ინდექსი რეინჯის გარეთაა. მასივის ზომაა"
+module.err.runtimeErrOutOfRangeSecond = "მაგრამ მოვითხოვეთ"
+module.err.codeError = "კოდი ვერ დაგენერირდა"
 
 -- success messages --
 module.success.showAST = "აბსტრაქტული სინტაქსის ხე"
