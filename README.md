@@ -18,7 +18,7 @@
 ```
 
 ## Todo
-- transpiler to Lua (optionally, Python and JS)
+- transpiler to Lua
 - (optional) pass over the entire AST and find all functions before translating anything
 - (optional) string literals
 

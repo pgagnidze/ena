@@ -395,4 +395,24 @@ function module:testFunctionCall()
     )
 end
 
+function module:testFunctionFactorial()
+    lu.assertEquals(
+        self:endToEnd(
+            [[
+            function fact(n = 4) {
+                if n != 0 {
+                    return n * fact(n - 1)
+                } else {
+                    return 1
+                }
+            }
+            function main() {
+                return fact()
+            }
+            ]]
+        ),
+        24
+    )
+end
+
 return module

@@ -5,6 +5,7 @@ local parser = require "parser"
 local interpreter = require "interpreter"
 local translator = require "lang.translator"
 local compiler = require "compiler"
+local transpiler = require "transpiler"
 local pt = require "helper.pt"
 
 -- help --
@@ -17,6 +18,7 @@ if arg[1] == "--help" or arg[1] == "-h" then
         {"--trace", "-t", "Trace the program."},
         {"--result", "-r", "Show the result."},
         {"--pegdebug", "-p", "Run the PEG debugger."},
+        {"--transpile", "-tp", "Transpile to Lua."},
         {"--translate", "-tr", "Translate messages to Georgian."}
     }
 
@@ -69,6 +71,8 @@ for index, argument in ipairs(arg) do
         show.pegdebug = true
     elseif lower_arg == "--translate" or lower_arg == "-tr" then
         show.translate = true
+    elseif lower_arg == "--transpile" or lower_arg == "-tp" then
+        show.transpile = true
     else
         io.stderr:write("Unknown argument" .. " | " .. translator.err.unknownArg .. ": " .. argument .. "." .. "\n")
         os.exit(1)
@@ -152,4 +156,10 @@ if show.trace then
 end
 if show.result then
     io.stdout:write((show.translate and translator.success.showResult or "Result") .. ":\n", tostring(result), "\n\n")
+end
+
+-- transpile --
+if show.transpile then
+    local transpiledCode = transpiler.transpile(ast)
+    io.stdout:write((show.transpile and translator.success.showTranspile or "Transpiled") .. ":\n", tostring(transpiledCode), "\n\n")
 end
