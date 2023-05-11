@@ -102,16 +102,17 @@ function Interpreter:traceStack()
 end
 
 function Interpreter:popStack(amount)
-    for _ = 1, amount do
-        table.remove(self.stack, self.top)
-        self.top = self.top - 1
+    for i = self.top + amount - 1, self.top, -1 do
+      self.stack[self.top] = nil
+      self.top = self.top - 1
     end
-end
+  end
 
 function Interpreter:run(code)
     local pc = 1
+    local base = self.top
     while pc <= #code do
-        --[[
+       --[[
       io.write "--> "
       for i = 1, self.top do io.write(self.stack[i], " ") end
       io.write("\n", code[pc], "\n")
@@ -184,10 +185,20 @@ function Interpreter:run(code)
             self.top = self.top + 1
             pc = pc + 1
             self.stack[self.top] = self.memory[code[pc]]
+        elseif code[pc] == 'loadLocal' then
+            self:traceTwoCodes(code, pc)
+            self.top = self.top + 1
+            pc = pc + 1
+            self.stack[self.top] = self.stack[base + code[pc] ]
         elseif code[pc] == "store" then
             self:traceTwoCodesAndStack(code, pc)
             pc = pc + 1
             self.memory[code[pc]] = self.stack[self.top]
+            self:popStack(1)
+        elseif code[pc] == 'storeLocal' then
+            self:traceTwoCodesAndStack(code, pc)
+            pc = pc + 1
+            self.stack[base + code[pc] ] = self.stack[self.top]
             self:popStack(1)
         elseif code[pc] == "newArray" then
             -- We consumed our default value from the stack, then pushed ourself, so no changes to the stack size.
@@ -291,8 +302,15 @@ function Interpreter:run(code)
             printValue(self.stack[self.top])
             io.write "\n"
             self:popStack(1)
-        elseif code[pc] == "return" then
-            self:traceUnaryOp(code[pc])
+        elseif code[pc] == 'return' then
+            self:traceCustom('return' .. (code[pc] == 0 and '' or ', pop ' .. code[pc + 1]))
+            pc = pc + 1
+            local pop = code[pc]
+            for i=self.top - pop,self.top do
+              self.stack[i] = self.stack[i + pop]
+            end
+            self:popStack(pop)
+            self:traceStack()
             return
         elseif code[pc] == "callFunction" then
             self:traceCustom(code[pc])

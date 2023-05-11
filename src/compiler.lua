@@ -34,11 +34,22 @@ function Compiler:new(o)
         {
             functions = {},
             variables = {},
-            nvars = 0
+            nvars = 0,
+            locals = {},
+            blockBases = {[0] = 0}
         }
     self.__index = self
     setmetatable(o, self)
     return o
+end
+
+function Compiler:findLocal (name)
+    local loc = self.locals
+    for i = #loc, 1, -1 do
+        if name == loc[i] then
+            return i
+        end
+    end
 end
 
 function Compiler:currentInstructionIndex()
@@ -95,15 +106,20 @@ function Compiler:codeExpression(ast)
         self:addCode("push")
         self:addCode(ast.value)
     elseif ast.tag == "variable" then
-        if self.variables[ast.value] == nil then
+        local idx = self:findLocal(ast.value)
+        if idx then
+            self:addCode("loadLocal")
+            self:addCode(idx)
+        elseif self.variables[ast.value] then
+            self:addCode('load')
+            self:addCode(self:variableToNumber(ast.value))
+        else
             error(
                 (self.translate and translator.err.compileErrUndefinedVariable or
                     "Trying to load from undefined variable") ..
                     ' "' .. ast.value .. '"'
             )
         end
-        self:addCode("load")
-        self:addCode(self:variableToNumber(ast.value))
     elseif ast.tag == "functionCall" then
         self:codeFunctionCall(ast)
     elseif ast.tag == "arrayElement" then
@@ -147,9 +163,15 @@ function Compiler:codeAssignment(ast)
             error('Assigning to variable "' .. ast.writeTarget.value .. '" with the same name as a function.')
         end
         self:codeExpression(ast.assignment)
-        self:addCode("store")
-        self:addCode(self:variableToNumber(ast.writeTarget.value))
-    elseif writeTarget.tag == "arrayElement" then
+        local idx = self:findLocal(ast.writeTarget.value)
+        if idx then
+            self:addCode('storeLocal')
+            self:addCode(idx)
+        else
+            self:addCode('store')
+            self:addCode(self:variableToNumber(ast.writeTarget.value))
+        end
+     elseif writeTarget.tag == "arrayElement" then
         self:codeExpression(ast.writeTarget.array)
         self:codeExpression(ast.writeTarget.index)
         self:codeExpression(ast.assignment)
@@ -159,15 +181,33 @@ function Compiler:codeAssignment(ast)
     end
 end
 
+function Compiler:codeBlock(ast)
+    local oldlevel = #self.locals
+    self.blockBases[#self.blockBases + 1] = oldlevel + 1
+    self:codeStatement(ast.body)
+    self.blockBases[#self.blockBases] = nil
+    local diff = #self.locals - oldlevel
+    if diff > 0 then
+        for i = 1, diff do
+            table.remove(self.locals)
+        end
+        self:addCode("pop")
+        self:addCode(diff)
+    end
+  end
+
 function Compiler:codeStatement(ast)
     if ast.tag == "emptyStatement" then
         return
+    elseif ast.tag == 'block' then
+        self:codeBlock(ast)
     elseif ast.tag == "statementSequence" then
         self:codeStatement(ast.firstChild)
         self:codeStatement(ast.secondChild)
     elseif ast.tag == "return" then
         self:codeExpression(ast.sentence)
         self:addCode("return")
+        self:addCode(#self.locals)
     elseif ast.tag == "functionCall" then
         self:codeFunctionCall(ast)
         -- Discard return value for function statements, since it's not used by anything.
@@ -175,6 +215,20 @@ function Compiler:codeStatement(ast)
         self:addCode(1)
     elseif ast.tag == "assignment" then
         self:codeAssignment(ast)
+    elseif ast.tag == "local" then
+        local oldLevel = #self.locals
+        for i=oldLevel,self.blockBases[#self.blockBases],-1 do
+            if self.locals[i] == ast.name then
+              error('Variable "' .. ast.name .. '" already defined in this scope.')
+            end
+          end
+        if ast.init then
+            self:codeExpression(ast.init)
+        else
+            self:addCode("push")
+            self:addCode(0)
+        end
+        self.locals[#self.locals + 1] = ast.name
     elseif ast.tag == "if" then
         -- Expression and jump
         self:codeExpression(ast.expression)
@@ -230,6 +284,7 @@ function Compiler:codeFunction(ast)
         self:addCode("push")
         self:addCode(0)
         self:addCode("return")
+        self:addCode(#self.locals)
     end
 end
 

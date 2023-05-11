@@ -146,6 +146,8 @@ local nodeIf = node("if", "expression", "block", "elseBlock")
 local nodeWhile = node("while", "expression", "block")
 local nodeFunction = node("function", "name", "block")
 local nodeFunctionCall = node("functionCall", "name")
+local nodeBlock = node('block', 'body')
+local nodeLocalVariable = node("local", "name", "init")
 
 local function nodeStatementSequence(first, rest)
     -- When first is empty, rest is nil, so we return an empty statement.
@@ -225,7 +227,7 @@ local grammar = {
         (blockStatement + sep.statement) /
         nodeFunction,
     statementList = statement ^ -1 * (sep.statement * statementList) ^ -1 / nodeStatementSequence,
-    blockStatement = delim.openBlock * statementList * sep.statement ^ -1 * delim.closeBlock,
+    blockStatement = delim.openBlock * statementList * sep.statement ^ -1 * delim.closeBlock / nodeBlock,
     elses = ((KW "elseif" + KW(translator.kwords.longForm.keyElseIf) + KW(translator.kwords.shortForm.keyElseIf)) *
         expression *
         blockStatement) *
@@ -236,7 +238,8 @@ local grammar = {
     variable = identifier / nodeVariable,
     functionCall = identifier * delim.openFunctionParameterList * delim.closeFunctionParameterList / nodeFunctionCall,
     writeTarget = Ct(variable * (delim.openArray * expression * delim.closeArray) ^ 0) / foldArrayElement,
-    statement = blockStatement + functionCall + writeTarget * op.assign * expression * -delim.openBlock / nodeAssignment + -- If
+    statement = blockStatement + functionCall + writeTarget * op.assign * expression * -delim.openBlock / nodeAssignment +
+        KW "local" * identifier * (op.assign * expression)^-1 / nodeLocalVariable + -- If
         (KW "if" + KW(translator.kwords.longForm.keyIf) + KW(translator.kwords.shortForm.keyIf)) * expression *
             blockStatement *
             elses /
