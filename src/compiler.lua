@@ -104,14 +104,21 @@ function Compiler:codeFunctionCall(ast)
         error('Undefined function "' .. ast.name .. '()."')
     end
     local args = ast.args
-    if #func.params ~= #args then
+    local hasDefault = next(func.defaultArgument) ~= nil
+    if hasDefault and #func.params == #args then
+        for i = 1, #args do
+            self:codeExpression(args[i])
+        end
+    elseif hasDefault and #func.params == #args + 1 then
+        for i = 1, #args - 1 do
+            self:codeExpression(args[i])
+        end
+        self:codeExpression(func.defaultArgument)
+    else
         error(
             (self.translate and translator.err.compileErrWrongNumberOfArguments or "Wrong number of arguments") ..
                 ' for function "' .. ast.name .. '()."'
         )
-    end
-    for i = 1, #args do
-        self:codeExpression(args[i])
     end
     self:addCode("callFunction")
     self:addCode(func.code)
@@ -279,6 +286,19 @@ function Compiler:codeStatement(ast)
     end
 end
 
+function Compiler:findFirstDuplicateParam(ast)
+    local params = self.functions[ast.name].params
+    local seen = {}
+    for _, value in pairs(params) do
+        if seen[value] then
+            return value
+        else
+            seen[value] = true
+        end
+    end
+    return nil
+end
+
 function Compiler:codeFunction(ast)
     if not ast.block then
         if not self.functions[ast.name] then
@@ -289,9 +309,13 @@ function Compiler:codeFunction(ast)
     if #functionCode > 0 and not self.functions[ast.name].forwardDeclaration then
         error("Duplicate function name " .. ast.name)
     end
-    self.functions[ast.name] = {code = functionCode, params = ast.params}
+    self.functions[ast.name] = {code = functionCode, params = ast.params, defaultArgument = ast.defaultArgument}
     self.code = functionCode
     self.params = ast.params
+    local firstDuplicate = self:findFirstDuplicateParam(ast)
+    if firstDuplicate then
+        error("Duplicate parameter name " .. firstDuplicate)
+    end
     self:codeStatement(ast.block)
     if functionCode[#functionCode] ~= "return" then
         self:addCode("push")
@@ -308,6 +332,10 @@ function Compiler:compile(ast)
     local entryPoint = self.functions[literals.entryPointName]
     if not entryPoint then
         error("No entrypoint found")
+    end
+
+    if #entryPoint.params > 0 then
+        error("Entrypoin function cannot have parameters")
     end
     return entryPoint.code
 end

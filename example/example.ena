@@ -1,4 +1,4 @@
-function fact(n) {
+function fact(n = 4) {
     if n != 0 {
         return n * fact(n - 1)
     } else {
@@ -7,5 +7,5 @@ function fact(n) {
 }
 
 function entrypoint() {
-    return fact(6)
+    return fact()
 }

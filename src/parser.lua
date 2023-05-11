@@ -145,7 +145,7 @@ local nodeReturn = node("return", "sentence")
 local nodeNumeral = node("number", "value")
 local nodeIf = node("if", "expression", "block", "elseBlock")
 local nodeWhile = node("while", "expression", "block")
-local nodeFunction = node("function", "name", "params", "block")
+local nodeFunction = node("function", "name", "params", "defaultArgument", "block")
 local nodeFunctionCall = node("functionCall", "name", "args")
 local nodeBlock = node("block", "body")
 local nodeLocalVariable = node("local", "name", "init")
@@ -225,7 +225,7 @@ local Ct = lpeg.Ct
 local grammar = {
     "program",
     program = endToken * Ct(funcDec ^ 1) * -1,
-    funcDec = KW "function" * identifier * delim.openFunctionParameterList * funcParams *
+    funcDec = KW "function" * identifier * delim.openFunctionParameterList * funcParams * ((op.assign * expression) + Cc(false)) *
         delim.closeFunctionParameterList *
         (blockStatement + sep.statement) /
         nodeFunction,
