@@ -1,10 +1,13 @@
 local module = {op = {}, delim = {}, sep = {}, comments = {}}
 
---  operators
+--  entrypoint --
+module.entryPointName = "entrypoint"
+
+--  operators --
 module.op.assign = "=" -- Assign is a special case. It's a statement operator.
 module.op.print = "@" -- Same with print.
 
--- binary operators
+-- binary operators --
 module.op.add = "+"
 module.op.subtract = "-"
 module.op.multiply = "*"
@@ -20,17 +23,17 @@ module.op.notEqual = "!="
 module.op.and_ = "&"
 module.op.or_ = "|"
 
--- unary operators
+-- unary operators --
 module.op.not_ = "!"
 module.op.positive = "+"
 module.op.negate = "-"
 
---  comments
+--  comments --
 module.comments.startLine = "#"
 module.comments.openBlock = "#{"
 module.comments.closeBlock = "#}"
 
---  delimiters
+--  delimiters --
 module.delim.openArray = "["
 module.delim.closeArray = "]"
 module.delim.openFactor = "("
@@ -40,9 +43,7 @@ module.delim.closeBlock = "}"
 module.delim.openFunctionParameterList = "("
 module.delim.closeFunctionParameterList = ")"
 
---  separators
+--  separators --
 module.sep.statement = ";"
-
-module.entryPointName = "entrypoint"
 
 return module

@@ -1,6 +1,6 @@
 local module = {}
-local translator = require "translator"
-local common = require("common")
+local translator = require "lang.translator"
+local common = require("helper.common")
 
 local Interpreter = {}
 
@@ -8,7 +8,6 @@ function Interpreter:new(o)
     o =
         o or
         {
-            errors = {},
             stack = {},
             top = 0,
             memory = {}
@@ -18,14 +17,10 @@ function Interpreter:new(o)
     return o
 end
 
-local function calculatePad(array)
-    return 0
-end
-
 local function printValue(array, depth, pad, last, visited)
     visited = visited or {}
     if pad == nil then
-        pad = calculatePad(array)
+        pad = 0
         printValue(array, depth, pad, last, visited)
         return
     end
@@ -107,8 +102,8 @@ function Interpreter:traceStack()
 end
 
 function Interpreter:popStack(amount)
-    for i = self.top + amount - 1, self.top, -1 do
-        self.stack[self.top] = nil
+    for _ = 1, amount do
+        table.remove(self.stack, self.top)
         self.top = self.top - 1
     end
 end

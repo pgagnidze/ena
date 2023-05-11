@@ -18,11 +18,13 @@
 ```
 
 ## Todo
+- translate functions
 - local variables and parameters
 - string literals
 - unless statement
 - undefined variables
-- translate functions
+- transpiler to Lua (Python and JS later)
+- pass over the entire AST and find all functions before translating anything
 
 ## ♥
 - Final project for the Building a Programming Language course by Roberto Ierusalimschy

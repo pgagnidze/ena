@@ -1,7 +1,7 @@
 local module = {}
-local translator = require "translator"
-local lop = require("literals").op
-local literals = require "literals"
+local translator = require "lang.translator"
+local literals = require "lang.literals"
+local lop = literals.op
 
 local Compiler = {}
 

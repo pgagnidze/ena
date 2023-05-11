@@ -1,10 +1,10 @@
 local lpeg = require "lpeg"
-local literals = require "literals"
+local literals = require "lang.literals"
 
 local P = lpeg.P
 local V = lpeg.V
 
-local common = {}
+local common = { kw = {} }
 
 common.endToken = V "endToken"
 

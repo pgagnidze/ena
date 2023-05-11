@@ -4,7 +4,6 @@ local module = {kwords = {longForm = {}, shortForm = {}}, err = {}, alphabet = {
 module.alphabet = "აბგდევზთიკლმნოპჟრსტუფქღყშჩცძწჭხჯჰ"
 
 -- custom language keywords --
-
 module.kwords.longForm.keyIf = "თუ"
 module.kwords.shortForm.keyIf = "თუ"
 
