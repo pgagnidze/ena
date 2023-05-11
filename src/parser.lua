@@ -225,7 +225,7 @@ local Ct = lpeg.Ct
 local grammar = {
     "program",
     program = endToken * Ct(funcDec ^ 1) * -1,
-    funcDec = KW "function" * identifier * delim.openFunctionParameterList * funcParams * ((op.assign * expression) + Cc(false)) *
+    funcDec = KW "function" * identifier * delim.openFunctionParameterList * funcParams * ((op.assign * expression) + Cc({})) *
         delim.closeFunctionParameterList *
         (blockStatement + sep.statement) /
         nodeFunction,

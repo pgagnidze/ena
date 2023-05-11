@@ -105,7 +105,7 @@ function Compiler:codeFunctionCall(ast)
     end
     local args = ast.args
     local hasDefault = next(func.defaultArgument) ~= nil
-    if hasDefault and #func.params == #args then
+    if #func.params == #args then
         for i = 1, #args do
             self:codeExpression(args[i])
         end
