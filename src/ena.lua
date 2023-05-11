@@ -146,5 +146,5 @@ if show.trace then
     io.stdout:write("\n")
 end
 if show.result then
-    io.stdout:write((show.translate and translator.success.showResult or "Result") .. ":\n", result, "\n\n")
+    io.stdout:write((show.translate and translator.success.showResult or "Result") .. ":\n", tostring(result), "\n\n")
 end

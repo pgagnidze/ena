@@ -125,7 +125,7 @@ function Compiler:codeFunctionCall(ast)
 end
 
 function Compiler:codeExpression(ast)
-    if ast.tag == "number" then
+    if ast.tag == "number" or ast.tag == "boolean" then
         self:addCode("push")
         self:addCode(ast.value)
     elseif ast.tag == "variable" then

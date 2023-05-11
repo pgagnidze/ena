@@ -144,6 +144,7 @@ local nodePrint = node("print", "toPrint")
 local nodeReturn = node("return", "sentence")
 local nodeNumeral = node("number", "value")
 local nodeIf = node("if", "expression", "block", "elseBlock")
+local nodeBoolean = node("boolean", "value")
 local nodeWhile = node("while", "expression", "block")
 local nodeFunction = node("function", "name", "params", "defaultArgument", "block")
 local nodeFunctionCall = node("functionCall", "name", "args")
@@ -213,6 +214,7 @@ local statement, statementList = V "statement", V "statementList"
 local elses = V "elses"
 local blockStatement = V "blockStatement"
 local expression = V "expression"
+local boolean = V "boolean"
 local variable = V "variable"
 local identifier = V "identifier"
 local writeTarget = V "writeTarget"
@@ -225,7 +227,8 @@ local Ct = lpeg.Ct
 local grammar = {
     "program",
     program = endToken * Ct(funcDec ^ 1) * -1,
-    funcDec = KW "function" * identifier * delim.openFunctionParameterList * funcParams * ((op.assign * expression) + Cc({})) *
+    funcDec = KW "function" * identifier * delim.openFunctionParameterList * funcParams *
+        ((op.assign * expression) + Cc({})) *
         delim.closeFunctionParameterList *
         (blockStatement + sep.statement) /
         nodeFunction,
@@ -258,6 +261,7 @@ local grammar = {
             nodeWhile +
         (op.print + KW(translator.kwords.longForm.keyPrint) + KW(translator.kwords.shortForm.keyPrint)) * expression /
             nodePrint,
+    boolean = (KW "true" * Cc(true) + KW "false" * Cc(false)) / nodeBoolean,
     primary = Ct(
         (KW "new" + KW(translator.kwords.longForm.keyNew) + KW(translator.kwords.shortForm.keyNew)) *
             (delim.openArray * expression * delim.closeArray) ^ 1
@@ -267,6 +271,7 @@ local grammar = {
         functionCall +
         writeTarget +
         numeral / nodeNumeral +
+        boolean +
         delim.openFactor * expression * delim.closeFactor,
     exponentExpr = primary * (op.exponent * exponentExpr) ^ -1 / addExponentOp,
     unaryExpr = op.unarySign * unaryExpr / addUnaryOp + exponentExpr,

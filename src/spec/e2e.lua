@@ -346,6 +346,20 @@ function module:testWhile()
     )
 end
 
+function module:testBoolean()
+    lu.assertEquals(
+        self:endToEnd(
+            [[
+            function entrypoint() {
+                local a = true;
+                return !a
+            }
+            ]]
+        ),
+        false
+    )
+end
+
 function module:testArrays()
     lu.assertEquals(
         self:endToEnd(
