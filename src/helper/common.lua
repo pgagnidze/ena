@@ -1,10 +1,9 @@
+local common = {}
 local lpeg = require "lpeg"
 local literals = require "lang.literals"
 
 local P = lpeg.P
 local V = lpeg.V
-
-local common = { kw = {} }
 
 common.endToken = V "endToken"
 
@@ -53,7 +52,6 @@ function common.copyObjectNoSelfReferences(object)
     return result
 end
 
--- Counts the number of occurrences of substring in string
 function common.count(substring, string)
     local matches = 0
     ((P(substring) / function()

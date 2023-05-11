@@ -30,7 +30,6 @@ local function printValue(array, depth, pad, last, visited)
         return
     end
 
-    -- Check if the table has already been visited
     if visited[array] then
         io.write("<selfrefer>")
         return
@@ -103,16 +102,16 @@ end
 
 function Interpreter:popStack(amount)
     for i = self.top + amount - 1, self.top, -1 do
-      self.stack[self.top] = nil
-      self.top = self.top - 1
+        self.stack[self.top] = nil
+        self.top = self.top - 1
     end
-  end
+end
 
 function Interpreter:run(code)
     local pc = 1
     local base = self.top
     while pc <= #code do
-       --[[
+        --[[
       io.write "--> "
       for i = 1, self.top do io.write(self.stack[i], " ") end
       io.write("\n", code[pc], "\n")
@@ -185,48 +184,36 @@ function Interpreter:run(code)
             self.top = self.top + 1
             pc = pc + 1
             self.stack[self.top] = self.memory[code[pc]]
-        elseif code[pc] == 'loadLocal' then
+        elseif code[pc] == "loadLocal" then
             self:traceTwoCodes(code, pc)
             self.top = self.top + 1
             pc = pc + 1
-            self.stack[self.top] = self.stack[base + code[pc] ]
+            self.stack[self.top] = self.stack[base + code[pc]]
         elseif code[pc] == "store" then
             self:traceTwoCodesAndStack(code, pc)
             pc = pc + 1
             self.memory[code[pc]] = self.stack[self.top]
             self:popStack(1)
-        elseif code[pc] == 'storeLocal' then
+        elseif code[pc] == "storeLocal" then
             self:traceTwoCodesAndStack(code, pc)
             pc = pc + 1
-            self.stack[base + code[pc] ] = self.stack[self.top]
+            self.stack[base + code[pc]] = self.stack[self.top]
             self:popStack(1)
         elseif code[pc] == "newArray" then
-            -- We consumed our default value from the stack, then pushed ourself, so no changes to the stack size.
             self:traceCustom(code[pc])
-            -- Our size is on the top of the stack
             local size = self.stack[self.top]
-            -- The default value for all our elements is the next stack element
             local defaultValue = self.stack[self.top - 1]
-
             local array = {size = size}
             for i = 1, size do
                 array[i] = common.copyObjectNoSelfReferences(defaultValue)
             end
-
-            -- We take two elements, but we are about to add one, so pop one element,
             self:popStack(1)
-            -- then overwrite the next one!
             self.stack[self.top] = array
         elseif code[pc] == "setArray" then
-            -- Which array we're getting is two elements below
             local array = self.stack[self.top - 2]
-            -- The index in the array is one element below
             local index = self.stack[self.top - 1]
-            -- Finally, the value we're setting to the array is at the top.
             local value = self.stack[self.top - 0]
-
             self:traceCustom(code[pc] .. " " .. "[" .. index .. "] = " .. tostring(value))
-
             if index > array.size or index < 1 then
                 error(
                     (self.translate and translator.err.runtimeErrOutOfRangeFirst or "Out of range. Array is size") ..
@@ -237,24 +224,13 @@ function Interpreter:run(code)
                                         " " .. index .. "."
                 )
             end
-
-            -- Set the array to this value
             array[index] = value
-
-            -- Pop the three things
             self:popStack(3)
         elseif code[pc] == "getArray" then
-            -- The array we are getting is one element below
             local array = self.stack[self.top - 1]
-            -- The index we're getting from the array is at the top
             local index = self.stack[self.top - 0]
-
             self:traceCustom(code[pc] .. " " .. "[" .. index .. "]")
-
-            -- We have consumed two things, but we're about to add one:
-            -- so just decrement by one to simulate popping two and pushing one.
             self:popStack(1)
-
             if index > array.size or index < 1 then
                 error(
                     (self.translate and translator.err.runtimeErrOutOfRangeFirst or "Out of range. Array is size") ..
@@ -265,10 +241,6 @@ function Interpreter:run(code)
                                         " " .. index .. "."
                 )
             end
-
-            -- Set the top of the stack to the value of this index of the array.
-            -- This is also now the index of where the array we loaded from was located,
-            -- so it has the benefit of removing the reference to that array from the stack.
             self.stack[self.top] = array[index]
         elseif code[pc] == "jump" then
             self:traceTwoCodes(code, pc)
@@ -302,12 +274,12 @@ function Interpreter:run(code)
             printValue(self.stack[self.top])
             io.write "\n"
             self:popStack(1)
-        elseif code[pc] == 'return' then
-            self:traceCustom('return' .. (code[pc] == 0 and '' or ', pop ' .. code[pc + 1]))
+        elseif code[pc] == "return" then
+            self:traceCustom("return" .. (code[pc] == 0 and "" or ", pop " .. code[pc + 1]))
             pc = pc + 1
             local pop = code[pc]
-            for i=self.top - pop,self.top do
-              self.stack[i] = self.stack[i + pop]
+            for i = self.top - pop, self.top do
+                self.stack[i] = self.stack[i + pop]
             end
             self:popStack(pop)
             self:traceStack()

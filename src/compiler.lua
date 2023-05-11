@@ -53,7 +53,7 @@ function Compiler:findLocal(name)
     local params = self.params
     for i = 1, #params do
         if name == params[i] then
-            return - (#params - i)
+            return -(#params - i)
         end
     end
     return nil
@@ -65,7 +65,7 @@ end
 
 function Compiler:addJump(opcode, target)
     self:addCode(opcode)
-    -- No target? Add placeholder.
+    -- Add placeholder.
     if target == nil then
         self:addCode(0)
         -- Will return the location of the 'zero' placeholder we just inserted.
@@ -106,8 +106,7 @@ function Compiler:codeFunctionCall(ast)
     local args = ast.args
     if #func.params ~= #args then
         error(
-            (self.translate and translator.err.compileErrWrongNumberOfArguments or
-                "Wrong number of arguments") ..
+            (self.translate and translator.err.compileErrWrongNumberOfArguments or "Wrong number of arguments") ..
                 ' for function "' .. ast.name .. '()."'
         )
     end
@@ -227,7 +226,6 @@ function Compiler:codeStatement(ast)
         self:addCode(#self.locals + #self.params)
     elseif ast.tag == "functionCall" then
         self:codeFunctionCall(ast)
-        -- Discard return value for function statements, since it's not used by anything.
         self:addCode("pop")
         self:addCode(1)
     elseif ast.tag == "assignment" then
@@ -256,13 +254,11 @@ function Compiler:codeStatement(ast)
             -- If else, we need an instruction at the end of
             -- the 'if' block to jump past the 'else' block
             local skipElseFixup = self:addJump("jump")
-
             -- And our target for failing the 'if' is this 'else,'
             -- so set its target here after the jump to the end of 'else.'
             self:fixupJump(skipIfFixup)
             -- Fill out the 'else'
             self:codeStatement(ast.elseBlock)
-
             -- Finally, set the 'skip else' jump to here, after the 'else' block
             self:fixupJump(skipElseFixup)
         else
@@ -289,7 +285,6 @@ function Compiler:codeFunction(ast)
             self.functions[ast.name] = {code = {}, forwardDeclaration = true}
         end
     end
-
     local functionCode = self.functions[ast.name] and self.functions[ast.name].code or {}
     if #functionCode > 0 and not self.functions[ast.name].forwardDeclaration then
         error("Duplicate function name " .. ast.name)
@@ -310,7 +305,6 @@ function Compiler:compile(ast)
     for i = 1, #ast do
         self:codeFunction(ast[i])
     end
-
     local entryPoint = self.functions[literals.entryPointName]
     if not entryPoint then
         error("No entrypoint found")

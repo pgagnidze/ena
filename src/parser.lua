@@ -1,4 +1,4 @@
-local module = { kw = {}}
+local module = {kw = {}}
 local literals = require "lang.literals"
 local translator = require "lang.translator"
 local lpeg = require "lpeg"
@@ -70,7 +70,7 @@ local alpha = R("AZ", "az") + geoalpha
 local identifierStartCharacters = (alpha + "_")
 local digit = R "09"
 local identifierTailCharacters = (alpha + digit + "_")
-local identifierPattern =  Cmt(identifierStartCharacters * identifierTailCharacters ^ 0, getIdentifier) * endToken
+local identifierPattern = Cmt(identifierStartCharacters * identifierTailCharacters ^ 0, getIdentifier) * endToken
 
 -- numeral --
 local sign = S("+-") * endToken
@@ -94,7 +94,7 @@ local baseStartDigit = R("09", "az", "AZ")
 local baseDigit = R("09", "az", "AZ") * P " " ^ -1
 local baseStart = "0" * (baseStartDigit / digitToBase) * P " " ^ -1
 local baseNumeral = (baseStart * C(baseDigit ^ 1))
-local numeral =  (baseNumeral + decimalNumeral) / toNumberWithUnary * endToken
+local numeral = (baseNumeral + decimalNumeral) / toNumberWithUnary * endToken
 
 -- tokens --
 local tokens = {op = {}, delim = {}, sep = {}, kw = {}}
@@ -147,7 +147,7 @@ local nodeIf = node("if", "expression", "block", "elseBlock")
 local nodeWhile = node("while", "expression", "block")
 local nodeFunction = node("function", "name", "params", "block")
 local nodeFunctionCall = node("functionCall", "name", "args")
-local nodeBlock = node('block', 'body')
+local nodeBlock = node("block", "body")
 local nodeLocalVariable = node("local", "name", "init")
 
 local function nodeStatementSequence(first, rest)
@@ -198,7 +198,6 @@ end
 
 local function foldNewArray(list, initialValue)
     local tree = initialValue
-    -- Reverse order, so that the leaf nodes are first in the AST.
     for i = #list, 1, -1 do
         tree = {tag = "newArray", initialValue = tree, size = list[i]}
     end
@@ -216,7 +215,7 @@ local blockStatement = V "blockStatement"
 local expression = V "expression"
 local variable = V "variable"
 local identifier = V "identifier"
-local writeTarget = V "writeTarget" -- left-hand side
+local writeTarget = V "writeTarget"
 local funcDec = lpeg.V "funcDec"
 local functionCall = lpeg.V "functionCall"
 local funcParams = lpeg.V "funcParams"
@@ -226,10 +225,11 @@ local Ct = lpeg.Ct
 local grammar = {
     "program",
     program = endToken * Ct(funcDec ^ 1) * -1,
-    funcDec = KW "function" * identifier * delim.openFunctionParameterList * funcParams * delim.closeFunctionParameterList *
+    funcDec = KW "function" * identifier * delim.openFunctionParameterList * funcParams *
+        delim.closeFunctionParameterList *
         (blockStatement + sep.statement) /
         nodeFunction,
-    funcParams = Ct((identifier * (delim.functionParameterSeparator * identifier) ^ 0)^-1),
+    funcParams = Ct((identifier * (delim.functionParameterSeparator * identifier) ^ 0) ^ -1),
     statementList = statement ^ -1 * (sep.statement * statementList) ^ -1 / nodeStatementSequence,
     blockStatement = delim.openBlock * statementList * sep.statement ^ -1 * delim.closeBlock / nodeBlock,
     elses = ((KW "elseif" + KW(translator.kwords.longForm.keyElseIf) + KW(translator.kwords.shortForm.keyElseIf)) *
@@ -240,24 +240,24 @@ local grammar = {
         ((KW "else" + KW(translator.kwords.longForm.keyElse) + KW(translator.kwords.shortForm.keyElse)) * blockStatement) ^
             -1,
     variable = identifier / nodeVariable,
-    functionCall = identifier * delim.openFunctionParameterList * funcArgs * delim.closeFunctionParameterList / nodeFunctionCall,
-    funcArgs = Ct((expression * (delim.functionParameterSeparator * expression) ^ 0)^-1),
+    functionCall = identifier * delim.openFunctionParameterList * funcArgs * delim.closeFunctionParameterList /
+        nodeFunctionCall,
+    funcArgs = Ct((expression * (delim.functionParameterSeparator * expression) ^ 0) ^ -1),
     writeTarget = Ct(variable * (delim.openArray * expression * delim.closeArray) ^ 0) / foldArrayElement,
     statement = blockStatement + functionCall + writeTarget * op.assign * expression * -delim.openBlock / nodeAssignment +
-        KW "local" * identifier * (op.assign * expression)^-1 / nodeLocalVariable + -- If
+        KW "local" * identifier * (op.assign * expression) ^ -1 / nodeLocalVariable +
         (KW "if" + KW(translator.kwords.longForm.keyIf) + KW(translator.kwords.shortForm.keyIf)) * expression *
             blockStatement *
             elses /
-            nodeIf + -- Return
+            nodeIf +
         (KW "return" + KW(translator.kwords.longForm.keyReturn) + KW(translator.kwords.shortForm.keyReturn)) *
             expression /
-            nodeReturn + -- While
+            nodeReturn +
         (KW "while" + KW(translator.kwords.longForm.keyWhile) + KW(translator.kwords.shortForm.keyWhile)) * expression *
             blockStatement /
-            nodeWhile + -- Print
+            nodeWhile +
         (op.print + KW(translator.kwords.longForm.keyPrint) + KW(translator.kwords.shortForm.keyPrint)) * expression /
             nodePrint,
-    -- Identifiers and numbers
     primary = Ct(
         (KW "new" + KW(translator.kwords.longForm.keyNew) + KW(translator.kwords.shortForm.keyNew)) *
             (delim.openArray * expression * delim.closeArray) ^ 1
@@ -267,9 +267,7 @@ local grammar = {
         functionCall +
         writeTarget +
         numeral / nodeNumeral +
-        -- Sentences in the language enclosed in parentheses
         delim.openFactor * expression * delim.closeFactor,
-    -- From highest to lowest precedence
     exponentExpr = primary * (op.exponent * exponentExpr) ^ -1 / addExponentOp,
     unaryExpr = op.unarySign * unaryExpr / addUnaryOp + exponentExpr,
     termExpr = Ct(unaryExpr * (op.term * unaryExpr) ^ 0) / foldBinaryOps,
