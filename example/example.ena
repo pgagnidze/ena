@@ -1,11 +1,11 @@
-function fact(n = 4) {
-    if n != 0 {
-        return n * fact(n - 1)
-    } else {
-        return 1
+ფუნქცია ფაქტორიალი(ნ = 6) {
+    თუ ნ != 0 {
+        დააბრუნე ნ * ფაქტორიალი(ნ - 1)
+    } თუარა {
+        დააბრუნე 1
     }
 }
 
-function entrypoint() {
-    return fact()
+ფუნქცია main() {
+    დააბრუნე ფაქტორიალი()
 }

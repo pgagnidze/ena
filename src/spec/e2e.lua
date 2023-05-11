@@ -350,7 +350,7 @@ function module:testBoolean()
     lu.assertEquals(
         self:endToEnd(
             [[
-            function entrypoint() {
+            function main() {
                 local a = true;
                 return !a
             }
@@ -364,7 +364,7 @@ function module:testArrays()
     lu.assertEquals(
         self:endToEnd(
             [[
-            function entrypoint() {
+            function main() {
                 array = new [2][2] 1;
                 array[1][1] = 0;
                 test = 0;
@@ -386,7 +386,7 @@ function module:testFunctionCall()
             function a() {
                 return 12
             }
-            function entrypoint() {
+            function main() {
                 return 24 + a();
             }
             ]]

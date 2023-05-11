@@ -1,7 +1,7 @@
 local module = {op = {}, delim = {}, sep = {}, comments = {}}
 
 --  entrypoint --
-module.entryPointName = "entrypoint"
+module.entryPointName = "main"
 
 --  operators --
 module.op.assign = "="

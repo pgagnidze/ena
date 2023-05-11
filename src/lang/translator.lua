@@ -25,16 +25,32 @@ module.kwords.shortForm.keyPrint = "მჩ"
 module.kwords.longForm.keyNew = "ახალი"
 module.kwords.shortForm.keyNew = "ახ"
 
+module.kwords.longForm.keyFunction = "ფუნქცია"
+module.kwords.shortForm.keyFunction = "ფუნ"
+
+module.kwords.longForm.keyLocal = "ლოკალური"
+module.kwords.shortForm.keyLocal = "ლოკ"
+
 -- error messages --
 module.err.unknownArg = "უცნობი არგუმენტი"
 module.err.noInputFile = "ფაილი ვერ მოიძებნა"
 module.err.fileOpen = "ფაილი ვერ გაიხსნა"
+module.err.codeError = "კოდი ვერ დაგენერირდა"
 module.err.syntaxErrAfterLine = "სინტაქსური შეცდომა ამ ხაზის შემდეგ"
 module.err.syntaxErrAtLine = "სინტაქსური შეცდომა ამ ხაზზე"
+
 module.err.compileErrUndefinedVariable = "ცვლადი არაა განსაზღვრული"
+module.err.compileErrUndefinedFunction = "ფუნქცია არაა განსაზღვრული"
+module.err.compileErrWrongNumberOfArguments = "არასწორი არგუმენტების რაოდენობა ფუნქციისთვის"
+module.err.compileErrVariableSameNameAsFunction = "ცვლადს აქვს იგივე სახელი რაც ფუნქციას"
+module.err.compileErrVariableAlreadyDefined = "ცვლადი უკვე განსაზღვრულია"
+module.err.compileErrDuplicateFunctionName = "ფუნქცია უკვე განსაზღვრულია"
+module.err.compileErrDuplicateParamName = "პარამეტრის სახელი უკვე განსაზღვრულია"
+module.err.compileErrNoEntryPointFound = "არ მოიძებნა მთავარი ფუნქცია"
+module.err.compileErrEntryPointParams = "მთავარ ფუნქციას არ უნდა ჰქონდეს პარამეტრები"
+
 module.err.runtimeErrOutOfRangeFirst = "მასივის ინდექსი რეინჯის გარეთაა. მასივის ზომაა"
 module.err.runtimeErrOutOfRangeSecond = "მაგრამ მოვითხოვეთ"
-module.err.codeError = "კოდი ვერ დაგენერირდა"
 
 -- success messages --
 module.success.showAST = "აბსტრაქტული სინტაქსის ხე"

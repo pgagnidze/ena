@@ -85,8 +85,13 @@ end
 if arg[1] == nil then
     io.stdout:write(
         [[
-ენა - Ena, the first Georgian programming language.
+ენა - Ena
+
+the first Georgian programming language.
 Enter the code here and press Ctrl+D to run it.
+
+პირველი ქართული პროგრამული ენა.usr
+შეიყვანე კოდი ქვემოთ და დააჭირე Ctrl+D რომ გაეშვას.
     ]] ..
             "\n"
     )

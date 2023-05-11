@@ -4,23 +4,20 @@
 ## მაგალითი
 
 ```ena
-ა = 20;
-ბ = 100;
-თუ ბ != ა {
-  ბ = 1
-} თუარადა ბ > ა {
-  ბ = 2
-} თუარა {
-  ბ = 3
-};
-მჩ ბ;
-დააბრუნე ბ;
+ფუნქცია ფაქტორიალი(ნ = 6) {
+    თუ ნ != 0 {
+        დააბრუნე ნ * ფაქტორიალი(ნ - 1)
+    } თუარა {
+        დააბრუნე 1
+    }
+}
+
+ფუნქცია main() {
+    დააბრუნე ფაქტორიალი()
+}
 ```
 
 ## Todo
-- translate functions
-- booleans
-- undefined variables
 - transpiler to Lua (optionally, Python and JS)
 - (optional) pass over the entire AST and find all functions before translating anything
 - (optional) string literals

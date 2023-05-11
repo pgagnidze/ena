@@ -227,7 +227,7 @@ local Ct = lpeg.Ct
 local grammar = {
     "program",
     program = endToken * Ct(funcDec ^ 1) * -1,
-    funcDec = KW "function" * identifier * delim.openFunctionParameterList * funcParams *
+    funcDec = (KW "function" + KW(translator.kwords.longForm.keyFunction) + KW(translator.kwords.shortForm.keyFunction)) * identifier * delim.openFunctionParameterList * funcParams *
         ((op.assign * expression) + Cc({})) *
         delim.closeFunctionParameterList *
         (blockStatement + sep.statement) /
@@ -248,7 +248,7 @@ local grammar = {
     funcArgs = Ct((expression * (delim.functionParameterSeparator * expression) ^ 0) ^ -1),
     writeTarget = Ct(variable * (delim.openArray * expression * delim.closeArray) ^ 0) / foldArrayElement,
     statement = blockStatement + functionCall + writeTarget * op.assign * expression * -delim.openBlock / nodeAssignment +
-        KW "local" * identifier * (op.assign * expression) ^ -1 / nodeLocalVariable +
+        (KW "local" + KW(translator.kwords.longForm.keyLocal) + KW(translator.kwords.shortForm.keyLocal)) * identifier * (op.assign * expression) ^ -1 / nodeLocalVariable +
         (KW "if" + KW(translator.kwords.longForm.keyIf) + KW(translator.kwords.shortForm.keyIf)) * expression *
             blockStatement *
             elses /

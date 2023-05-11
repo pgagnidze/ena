@@ -101,7 +101,10 @@ end
 function Compiler:codeFunctionCall(ast)
     local func = self.functions[ast.name]
     if not func then
-        error('Undefined function "' .. ast.name .. '()."')
+        error(
+            (self.translate and translator.err.compileErrUndefinedFunction or "Undefined function") ..
+                ' "' .. ast.name .. '()"'
+        )
     end
     local args = ast.args
     local hasDefault = next(func.defaultArgument) ~= nil
@@ -116,8 +119,9 @@ function Compiler:codeFunctionCall(ast)
         self:codeExpression(func.defaultArgument)
     else
         error(
-            (self.translate and translator.err.compileErrWrongNumberOfArguments or "Wrong number of arguments") ..
-                ' for function "' .. ast.name .. '()."'
+            (self.translate and translator.err.compileErrWrongNumberOfArguments or
+                "Wrong number of arguments for function") ..
+                ' "' .. ast.name .. '()"'
         )
     end
     self:addCode("callFunction")
@@ -183,7 +187,11 @@ function Compiler:codeAssignment(ast)
     local writeTarget = ast.writeTarget
     if writeTarget.tag == "variable" then
         if self.functions[ast.writeTarget.value] then
-            error('Assigning to variable "' .. ast.writeTarget.value .. '" with the same name as a function.')
+            error(
+                (self.translate and translator.err.compileErrVariableSameNameAsFunction or
+                    "Assigning to variable with the same name as a function") ..
+                    ' "' .. ast.writeTarget.value .. '"'
+            )
         end
         self:codeExpression(ast.assignment)
         local idx = self:findLocal(ast.writeTarget.value)
@@ -241,7 +249,11 @@ function Compiler:codeStatement(ast)
         local oldLevel = #self.locals
         for i = oldLevel, self.blockBases[#self.blockBases], -1 do
             if self.locals[i] == ast.name then
-                error('Variable "' .. ast.name .. '" already defined in this scope.')
+                error(
+                    (self.translate and translator.err.compileErrVariableAlreadyDefined or
+                        "Variable already defined in this scope") ..
+                        ' "' .. ast.name .. '"'
+                )
             end
         end
         if ast.init then
@@ -307,14 +319,20 @@ function Compiler:codeFunction(ast)
     end
     local functionCode = self.functions[ast.name] and self.functions[ast.name].code or {}
     if #functionCode > 0 and not self.functions[ast.name].forwardDeclaration then
-        error("Duplicate function name " .. ast.name)
+        error(
+            (self.translate and translator.err.compileErrDuplicateFunctionName or "Duplicate function name") ..
+                ' "' .. ast.name .. '()"'
+        )
     end
     self.functions[ast.name] = {code = functionCode, params = ast.params, defaultArgument = ast.defaultArgument}
     self.code = functionCode
     self.params = ast.params
     local firstDuplicate = self:findFirstDuplicateParam(ast)
     if firstDuplicate then
-        error("Duplicate parameter name " .. firstDuplicate)
+        error(
+            (self.translate and translator.err.compileErrDuplicateParamName or "Duplicate parameter name") ..
+                ' "' .. firstDuplicate .. '"'
+        )
     end
     self:codeStatement(ast.block)
     if functionCode[#functionCode] ~= "return" then
@@ -331,11 +349,13 @@ function Compiler:compile(ast)
     end
     local entryPoint = self.functions[literals.entryPointName]
     if not entryPoint then
-        error("No entrypoint found")
+        error(self.translate and translator.err.compileErrNoEntryPointFound or "No entrypoint found")
     end
 
     if #entryPoint.params > 0 then
-        error("Entrypoin function cannot have parameters")
+        error(
+            self.translate and translator.err.compileErrEntryPointParams or "Entrypoint function cannot have parameters"
+        )
     end
     return entryPoint.code
 end
