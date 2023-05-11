@@ -4,8 +4,8 @@ local module = {op = {}, delim = {}, sep = {}, comments = {}}
 module.entryPointName = "entrypoint"
 
 --  operators --
-module.op.assign = "=" -- Assign is a special case. It's a statement operator.
-module.op.print = "@" -- Same with print.
+module.op.assign = "="
+module.op.print = "@"
 
 -- binary operators --
 module.op.add = "+"
@@ -45,5 +45,6 @@ module.delim.closeFunctionParameterList = ")"
 
 --  separators --
 module.sep.statement = ";"
+module.delim.functionParameterSeparator = ","
 
 return module

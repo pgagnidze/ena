@@ -19,12 +19,11 @@
 
 ## Todo
 - translate functions
-- local variables and parameters
-- string literals
-- unless statement
+- booleans
 - undefined variables
-- transpiler to Lua (Python and JS later)
-- pass over the entire AST and find all functions before translating anything
+- transpiler to Lua (optionally, Python and JS)
+- (optional) pass over the entire AST and find all functions before translating anything
+- (optional) string literals
 
 ## ♥
 - Final project for the Building a Programming Language course by Roberto Ierusalimschy

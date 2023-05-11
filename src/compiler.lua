@@ -43,13 +43,20 @@ function Compiler:new(o)
     return o
 end
 
-function Compiler:findLocal (name)
+function Compiler:findLocal(name)
     local loc = self.locals
     for i = #loc, 1, -1 do
         if name == loc[i] then
             return i
         end
     end
+    local params = self.params
+    for i = 1, #params do
+        if name == params[i] then
+            return - (#params - i)
+        end
+    end
+    return nil
 end
 
 function Compiler:currentInstructionIndex()
@@ -95,10 +102,20 @@ function Compiler:codeFunctionCall(ast)
     local func = self.functions[ast.name]
     if not func then
         error('Undefined function "' .. ast.name .. '()."')
-    else
-        self:addCode("callFunction")
-        self:addCode(func.code)
     end
+    local args = ast.args
+    if #func.params ~= #args then
+        error(
+            (self.translate and translator.err.compileErrWrongNumberOfArguments or
+                "Wrong number of arguments") ..
+                ' for function "' .. ast.name .. '()."'
+        )
+    end
+    for i = 1, #args do
+        self:codeExpression(args[i])
+    end
+    self:addCode("callFunction")
+    self:addCode(func.code)
 end
 
 function Compiler:codeExpression(ast)
@@ -111,7 +128,7 @@ function Compiler:codeExpression(ast)
             self:addCode("loadLocal")
             self:addCode(idx)
         elseif self.variables[ast.value] then
-            self:addCode('load')
+            self:addCode("load")
             self:addCode(self:variableToNumber(ast.value))
         else
             error(
@@ -165,13 +182,13 @@ function Compiler:codeAssignment(ast)
         self:codeExpression(ast.assignment)
         local idx = self:findLocal(ast.writeTarget.value)
         if idx then
-            self:addCode('storeLocal')
+            self:addCode("storeLocal")
             self:addCode(idx)
         else
-            self:addCode('store')
+            self:addCode("store")
             self:addCode(self:variableToNumber(ast.writeTarget.value))
         end
-     elseif writeTarget.tag == "arrayElement" then
+    elseif writeTarget.tag == "arrayElement" then
         self:codeExpression(ast.writeTarget.array)
         self:codeExpression(ast.writeTarget.index)
         self:codeExpression(ast.assignment)
@@ -194,12 +211,12 @@ function Compiler:codeBlock(ast)
         self:addCode("pop")
         self:addCode(diff)
     end
-  end
+end
 
 function Compiler:codeStatement(ast)
     if ast.tag == "emptyStatement" then
         return
-    elseif ast.tag == 'block' then
+    elseif ast.tag == "block" then
         self:codeBlock(ast)
     elseif ast.tag == "statementSequence" then
         self:codeStatement(ast.firstChild)
@@ -207,7 +224,7 @@ function Compiler:codeStatement(ast)
     elseif ast.tag == "return" then
         self:codeExpression(ast.sentence)
         self:addCode("return")
-        self:addCode(#self.locals)
+        self:addCode(#self.locals + #self.params)
     elseif ast.tag == "functionCall" then
         self:codeFunctionCall(ast)
         -- Discard return value for function statements, since it's not used by anything.
@@ -217,11 +234,11 @@ function Compiler:codeStatement(ast)
         self:codeAssignment(ast)
     elseif ast.tag == "local" then
         local oldLevel = #self.locals
-        for i=oldLevel,self.blockBases[#self.blockBases],-1 do
+        for i = oldLevel, self.blockBases[#self.blockBases], -1 do
             if self.locals[i] == ast.name then
-              error('Variable "' .. ast.name .. '" already defined in this scope.')
+                error('Variable "' .. ast.name .. '" already defined in this scope.')
             end
-          end
+        end
         if ast.init then
             self:codeExpression(ast.init)
         else
@@ -277,14 +294,15 @@ function Compiler:codeFunction(ast)
     if #functionCode > 0 and not self.functions[ast.name].forwardDeclaration then
         error("Duplicate function name " .. ast.name)
     end
-    self.functions[ast.name] = {code = functionCode}
+    self.functions[ast.name] = {code = functionCode, params = ast.params}
     self.code = functionCode
+    self.params = ast.params
     self:codeStatement(ast.block)
     if functionCode[#functionCode] ~= "return" then
         self:addCode("push")
         self:addCode(0)
         self:addCode("return")
-        self:addCode(#self.locals)
+        self:addCode(#self.locals + #self.params)
     end
 end
 

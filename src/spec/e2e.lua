@@ -27,7 +27,7 @@ function module:testIdentifiers()
     local tests = {
         {input = "_leading_underscore", expected = 1},
         {input = "has spaces", expected = "Parsing failed"},
-        {input = "has-hyphens", expected = 1},
+        {input = "has-hyphens", expected = "Parsing failed"},
         {input = "წერე_ქართულად", expected = 1},
         {input = "0not valid", expected = "Parsing failed"}
     }

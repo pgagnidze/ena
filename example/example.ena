@@ -1,7 +1,11 @@
-function entrypoint() {
-    { local x = 10;
-    local y = 20;
-    y = x + 3;
-    return y
+function fact(n) {
+    if n != 0 {
+        return n * fact(n - 1)
+    } else {
+        return 1
     }
+}
+
+function entrypoint() {
+    return fact(6)
 }

@@ -70,7 +70,7 @@ local alpha = R("AZ", "az") + geoalpha
 local identifierStartCharacters = (alpha + "_")
 local digit = R "09"
 local identifierTailCharacters = (alpha + digit + "_")
-local identifierPattern =  Cmt(identifierStartCharacters * (S "-" ^ -1 * identifierTailCharacters) ^ 0, getIdentifier) * endToken
+local identifierPattern =  Cmt(identifierStartCharacters * identifierTailCharacters ^ 0, getIdentifier) * endToken
 
 -- numeral --
 local sign = S("+-") * endToken
@@ -110,6 +110,7 @@ tokens.delim.openFunctionParameterList = T(l.delim.openFunctionParameterList)
 tokens.delim.closeFunctionParameterList = T(l.delim.closeFunctionParameterList)
 
 -- separators
+tokens.delim.functionParameterSeparator = T(l.delim.functionParameterSeparator)
 tokens.sep.statement = T(l.sep.statement)
 tokens.op.assign = T(l.op.assign)
 tokens.op.sum = T(C(P(l.op.add) + l.op.subtract))
@@ -144,8 +145,8 @@ local nodeReturn = node("return", "sentence")
 local nodeNumeral = node("number", "value")
 local nodeIf = node("if", "expression", "block", "elseBlock")
 local nodeWhile = node("while", "expression", "block")
-local nodeFunction = node("function", "name", "block")
-local nodeFunctionCall = node("functionCall", "name")
+local nodeFunction = node("function", "name", "params", "block")
+local nodeFunctionCall = node("functionCall", "name", "args")
 local nodeBlock = node('block', 'body')
 local nodeLocalVariable = node("local", "name", "init")
 
@@ -218,14 +219,17 @@ local identifier = V "identifier"
 local writeTarget = V "writeTarget" -- left-hand side
 local funcDec = lpeg.V "funcDec"
 local functionCall = lpeg.V "functionCall"
+local funcParams = lpeg.V "funcParams"
+local funcArgs = lpeg.V "funcArgs"
 
 local Ct = lpeg.Ct
 local grammar = {
     "program",
     program = endToken * Ct(funcDec ^ 1) * -1,
-    funcDec = KW "function" * identifier * delim.openFunctionParameterList * delim.closeFunctionParameterList *
+    funcDec = KW "function" * identifier * delim.openFunctionParameterList * funcParams * delim.closeFunctionParameterList *
         (blockStatement + sep.statement) /
         nodeFunction,
+    funcParams = Ct((identifier * (delim.functionParameterSeparator * identifier) ^ 0)^-1),
     statementList = statement ^ -1 * (sep.statement * statementList) ^ -1 / nodeStatementSequence,
     blockStatement = delim.openBlock * statementList * sep.statement ^ -1 * delim.closeBlock / nodeBlock,
     elses = ((KW "elseif" + KW(translator.kwords.longForm.keyElseIf) + KW(translator.kwords.shortForm.keyElseIf)) *
@@ -236,7 +240,8 @@ local grammar = {
         ((KW "else" + KW(translator.kwords.longForm.keyElse) + KW(translator.kwords.shortForm.keyElse)) * blockStatement) ^
             -1,
     variable = identifier / nodeVariable,
-    functionCall = identifier * delim.openFunctionParameterList * delim.closeFunctionParameterList / nodeFunctionCall,
+    functionCall = identifier * delim.openFunctionParameterList * funcArgs * delim.closeFunctionParameterList / nodeFunctionCall,
+    funcArgs = Ct((expression * (delim.functionParameterSeparator * expression) ^ 0)^-1),
     writeTarget = Ct(variable * (delim.openArray * expression * delim.closeArray) ^ 0) / foldArrayElement,
     statement = blockStatement + functionCall + writeTarget * op.assign * expression * -delim.openBlock / nodeAssignment +
         KW "local" * identifier * (op.assign * expression)^-1 / nodeLocalVariable + -- If
