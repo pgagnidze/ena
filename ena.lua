@@ -39,7 +39,7 @@ end
 if arg[1] ~= nil and (string.lower(arg[1]) == "--tests") then
     arg[1] = nil
     _G.lu = require "luaunit"
-    _G.testEna = require("spec.e2e"):init(parser.parse, compiler, interpreter)
+    _G.testEna = require("ena.spec.e2e"):init(parser.parse, compiler, interpreter)
     _G.grammar = grammar
     os.exit(_G.lu.LuaUnit.run())
 end
@@ -96,7 +96,7 @@ if arg[1] == nil then
 the first Georgian programming language.
 Enter the code here and press Ctrl+D to run it.
 
-პირველი ქართული პროგრამული ენა.usr
+პირველი ქართული პროგრამული ენა.
 შეიყვანე კოდი ქვემოთ და დააჭირე Ctrl+D რომ გაეშვას.
     ]] ..
             "\n"
