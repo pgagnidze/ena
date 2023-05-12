@@ -1,5 +1,5 @@
 package = 'Ena'
-version = '0.0.1-1'
+version = '0.0.1-2'
 description = {
   summary = 'Ena: The First Georgian Programming Language',
   detailed = [[
