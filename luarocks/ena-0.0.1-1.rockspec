@@ -26,7 +26,21 @@ dependencies = {
 build = {
   type = 'builtin',
   modules = {
-    ["ena"] = "src/ena.lua",
+    ["ena.ena"] = "ena/ena.lua",
+    ["ena.parser"] = "ena/parser.lua",
+    ["ena.compiler"] = "ena/compiler.lua",
+    ["ena.interpreter"] = "ena/interpreter.lua",
+    ["ena.transpiler"] = "ena/transpiler.lua",
+    ["ena.lang.literals"] = "ena/lang/literals.lua",
+    ["ena.lang.translator"] = "ena/lang/translator.lua",
+    ["ena.helper.common"] = "ena/helper/common.lua",
+    ["ena.helper.pegdebug"] = "ena/helper/pegdebug.lua",
+    ["ena.helper.pt"] = "ena/helper/pt.lua",
+    ["ena.spec.e2e"] = "ena/spec/e2e.lua",
   },
-  copy_directories = { "src" }
+  install = {
+    bin = {
+      ena = 'ena.lua'
+    },
+  },
 }

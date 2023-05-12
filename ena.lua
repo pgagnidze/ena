@@ -1,5 +1,7 @@
 #!/usr/bin/env lua
 
+package.path = package.path .. ';ena/?.lua'
+
 local common = require "helper.common"
 local parser = require "parser"
 local interpreter = require "interpreter"
