@@ -163,3 +163,9 @@ if show.transpile then
     local transpiledCode = transpiler.transpile(ast)
     io.stdout:write((show.transpile and translator.success.showTranspile or "Transpiled") .. ":\n", tostring(transpiledCode), "\n\n")
 end
+
+--[[
+Todo:
+- String literals
+- Dictionaries
+]]
