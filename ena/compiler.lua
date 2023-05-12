@@ -1,6 +1,6 @@
 local module = {}
-local translator = require "lang.translator"
-local literals = require "lang.literals"
+local translator = require "ena.lang.translator"
+local literals = require "ena.lang.literals"
 local lop = literals.op
 
 local Compiler = {}

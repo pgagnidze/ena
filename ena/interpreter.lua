@@ -1,6 +1,6 @@
 local module = {}
-local translator = require "lang.translator"
-local common = require("helper.common")
+local translator = require "ena.lang.translator"
+local common = require("ena.helper.common")
 
 local Interpreter = {}
 

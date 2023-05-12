@@ -1,6 +1,6 @@
 local module = {}
 local lu = require "luaunit"
-local entryPointName = require("lang.literals").entryPointName
+local entryPointName = require("ena.lang.literals").entryPointName
 
 local function wrapWithEntrypoint(string)
     return "function " .. entryPointName .. "() {" .. string .. "}"

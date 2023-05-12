@@ -1,8 +1,8 @@
 local module = {kw = {}}
-local literals = require "lang.literals"
-local translator = require "lang.translator"
+local literals = require "ena.lang.literals"
+local translator = require "ena.lang.translator"
 local lpeg = require "lpeg"
-local common = require "helper.common"
+local common = require "ena.helper.common"
 local endToken = common.endToken
 local l = literals
 

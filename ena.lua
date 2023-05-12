@@ -2,13 +2,13 @@
 
 package.path = package.path .. ';ena/?.lua'
 
-local common = require "helper.common"
-local parser = require "parser"
-local interpreter = require "interpreter"
-local translator = require "lang.translator"
-local compiler = require "compiler"
-local transpiler = require "transpiler"
-local pt = require "helper.pt"
+local common = require "ena.helper.common"
+local parser = require "ena.parser"
+local interpreter = require "ena.interpreter"
+local translator = require "ena.lang.translator"
+local compiler = require "ena.compiler"
+local transpiler = require "ena.transpiler"
+local pt = require "ena.helper.pt"
 
 -- help --
 if arg[1] == "--help" or arg[1] == "-h" then

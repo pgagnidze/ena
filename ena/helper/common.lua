@@ -1,6 +1,6 @@
 local common = {}
 local lpeg = require "lpeg"
-local literals = require "lang.literals"
+local literals = require "ena.lang.literals"
 
 local P = lpeg.P
 local V = lpeg.V
