@@ -9,7 +9,7 @@
 - ფუნქციები - ფუნქციების შექმნა და გამოძახება.
 
 ## ინსტალაცია
-1. დააინსტალირეთ (Lua)[https://www.lua.org/start.html#installing] და LuaRocks (https://github.com/luarocks/luarocks/wiki/Download)
+1. დააინსტალირეთ [Lua](https://www.lua.org/start.html#installing) და [LuaRocks](https://github.com/luarocks/luarocks/wiki/Download)
 2. გაუშვით შემდეგი ბრძანება ტერმინალში - `$ luarocks install ena`
 
 ## გამოყენება
