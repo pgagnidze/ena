@@ -9,9 +9,8 @@
 - ფუნქციები - ფუნქციების შექმნა და გამოძახება.
 
 ## ინსტალაცია
-1. დააინსტალირეთ Lua 5.4 - https://www.lua.org/start.html#installing
-2. დააინსტალირეთ LuaRocks - https://github.com/luarocks/luarocks/wiki/Download
-3. გაუშვით შემდეგი ბრძანება ტერმინალში - `$ luarocks install ena`
+1. დააინსტალირეთ (Lua)[https://www.lua.org/start.html#installing] და LuaRocks (https://github.com/luarocks/luarocks/wiki/Download)
+2. გაუშვით შემდეგი ბრძანება ტერმინალში - `$ luarocks install ena`
 
 ## გამოყენება
 ენა შეგვიძლია გავუშვათ ასე:
@@ -25,7 +24,7 @@ options-ები მოიცავს:
 | --input | -i | მიუთითეთ შესაყვანი ფაილი. |
 | --ast | -a | აჩვენეთ აბსტრაქტული სინტაქსის ხე. |
 | --code | -c | აჩვენეთ გენერირებული კოდი. |
-| --trace | -t | მიყევით პროგრამის მსვლელობას. |
+| --trace | -t | მიჰყევით პროგრამის მსვლელობას. |
 | --result | -r | აჩვენეთ შედეგი. |
 | --pegdebug | -p | გაუშვით PEG დებაგერი. |
 | --transpile | -tp | ტრანსპილაცია Lua-ში. |
