@@ -227,7 +227,10 @@ local Ct = lpeg.Ct
 local grammar = {
     "program",
     program = endToken * Ct(funcDec ^ 1) * -1,
-    funcDec = (KW "function" + KW(translator.kwords.longForm.keyFunction) + KW(translator.kwords.shortForm.keyFunction)) * identifier * delim.openFunctionParameterList * funcParams *
+    funcDec = (KW "function" + KW(translator.kwords.longForm.keyFunction) + KW(translator.kwords.shortForm.keyFunction)) *
+        identifier *
+        delim.openFunctionParameterList *
+        funcParams *
         ((op.assign * expression) + Cc({})) *
         delim.closeFunctionParameterList *
         (blockStatement + sep.statement) /
@@ -248,7 +251,9 @@ local grammar = {
     funcArgs = Ct((expression * (delim.functionParameterSeparator * expression) ^ 0) ^ -1),
     writeTarget = Ct(variable * (delim.openArray * expression * delim.closeArray) ^ 0) / foldArrayElement,
     statement = blockStatement + functionCall + writeTarget * op.assign * expression * -delim.openBlock / nodeAssignment +
-        (KW "local" + KW(translator.kwords.longForm.keyLocal) + KW(translator.kwords.shortForm.keyLocal)) * identifier * (op.assign * expression) ^ -1 / nodeLocalVariable +
+        (KW "local" + KW(translator.kwords.longForm.keyLocal) + KW(translator.kwords.shortForm.keyLocal)) * identifier *
+            (op.assign * expression) ^ -1 /
+            nodeLocalVariable +
         (KW "if" + KW(translator.kwords.longForm.keyIf) + KW(translator.kwords.shortForm.keyIf)) * expression *
             blockStatement *
             elses /
@@ -261,7 +266,9 @@ local grammar = {
             nodeWhile +
         (op.print + KW(translator.kwords.longForm.keyPrint) + KW(translator.kwords.shortForm.keyPrint)) * expression /
             nodePrint,
-    boolean = (KW "true" * Cc(true) + KW "false" * Cc(false)) / nodeBoolean,
+    boolean = ((KW "true" + KW(translator.values.longForm.valTrue) + KW(translator.values.shortForm.valTrue)) * Cc(true) +
+        (KW "false" + KW(translator.values.longForm.valFalse) + KW(translator.values.shortForm.valFalse)) * Cc(false)) /
+        nodeBoolean,
     primary = Ct(
         (KW "new" + KW(translator.kwords.longForm.keyNew) + KW(translator.kwords.shortForm.keyNew)) *
             (delim.openArray * expression * delim.closeArray) ^ 1

@@ -1,4 +1,10 @@
-local module = {kwords = {longForm = {}, shortForm = {}}, err = {}, alphabet = {}, success = {}}
+local module = {
+    kwords = {longForm = {}, shortForm = {}},
+    values = {longForm = {}, shortForm = {}},
+    err = {},
+    alphabet = {},
+    success = {}
+}
 
 -- alphabet --
 module.alphabet = "აბგდევზთიკლმნოპჟრსტუფქღყშჩცძწჭხჯჰ"
@@ -30,6 +36,13 @@ module.kwords.shortForm.keyFunction = "ფუნ"
 
 module.kwords.longForm.keyLocal = "ლოკალური"
 module.kwords.shortForm.keyLocal = "ლოკ"
+
+-- custom language boolean values --
+module.values.longForm.valTrue = "ჭეშმარიტი"
+module.values.shortForm.valTrue = "ჭეშ"
+
+module.values.longForm.valFalse = "მცდარი"
+module.values.shortForm.valFalse = "მც"
 
 -- error messages --
 module.err.unknownArg = "უცნობი არგუმენტი"
