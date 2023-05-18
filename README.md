@@ -17,6 +17,7 @@
 ## ინსტალაცია
 1. დააინსტალირეთ [Lua](https://www.lua.org/start.html#installing) და [LuaRocks](https://github.com/luarocks/luarocks/wiki/Download)
 2. გაუშვით შემდეგი ბრძანება ტერმინალში - `$ luarocks install ena`
+3. დააინსტალირეთ VS Code [Extension](https://marketplace.visualstudio.com/items?itemName=pgagnidze.ena) სინტაქსის ამოცნობისთვის
 
 ## გამოყენება
 ენა შეგვიძლია გავუშვათ ასე:
