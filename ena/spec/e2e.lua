@@ -415,4 +415,37 @@ function module:testFunctionFactorial()
     )
 end
 
+function module:testStringLiterals()
+    lu.assertEquals(
+        self:endToEnd(
+            [[
+            function a() {
+                str = "string ";
+                return str
+            }
+            function main() {
+                return a() + "literals";
+            }
+            ]]
+        ),
+        "string literals"
+    )
+end
+
+function module:testStringLiteralsReturn()
+    lu.assertEquals(
+        self:endToEnd(
+            [[
+            function a() {
+                return "string "
+            }
+            function main() {
+                return a() + "literals";
+            }
+            ]]
+        ),
+        "string literals"
+    )
+end
+
 return module

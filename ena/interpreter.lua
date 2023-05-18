@@ -67,7 +67,7 @@ end
 
 function Interpreter:traceBinaryOp(operator)
     if self.trace then
-        self.trace[#self.trace + 1] = operator .. " " .. self.stack[self.top - 1] .. " " .. self.stack[self.top]
+        self.trace[#self.trace + 1] = operator .. " " .. tostring(self.stack[self.top - 1]) .. " " .. tostring(self.stack[self.top])
     end
 end
 
@@ -127,7 +127,11 @@ function Interpreter:run(code)
             self:popStack(code[pc])
         elseif code[pc] == "add" then
             self:traceBinaryOp(code[pc])
-            self.stack[self.top - 1] = self.stack[self.top - 1] + self.stack[self.top]
+            if type(self.stack[self.top - 1]) == "string" and type(self.stack[self.top]) == "string" then
+                self.stack[self.top - 1] = self.stack[self.top - 1] .. self.stack[self.top]
+            else
+                self.stack[self.top - 1] = self.stack[self.top - 1] + self.stack[self.top]
+            end
             self:popStack(1)
         elseif code[pc] == "subtract" then
             self:traceBinaryOp(code[pc])

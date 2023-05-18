@@ -41,7 +41,6 @@ local georgianToEnglish = {
     ["ჰ"] = "h"
 }
 
--- TODO: feat: print, comments
 local handlers = {
     ["function"] = function(transpiler, node, indentLevel, indent)
         local params = {}
@@ -142,6 +141,12 @@ local handlers = {
     end,
     ["number"] = function(transpiler, node, indentLevel, indent)
         return node.value
+    end,
+    ["string"] = function(transpiler, node, indentLevel, indent)
+        return '"' .. node.value .. '"'
+    end,
+    ["print"] = function(transpiler, node, indentLevel, indent)
+        return indent .. "print(" .. transpiler:transpile(node.toPrint, indentLevel) .. ")"
     end,
     ["variable"] = function(transpiler, node, indentLevel, indent)
         return node.value

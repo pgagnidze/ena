@@ -105,7 +105,7 @@ end
 
 -- parse --
 local input = io.read "a"
-local ast = parser.parse(input)
+local ast = parser.parse(input, show.pegdebug)
 if not ast then
     local furthestMatch = common.getFurthestMatch()
     local newlineCount = common.count("\n", input:sub(1, furthestMatch))

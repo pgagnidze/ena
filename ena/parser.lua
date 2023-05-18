@@ -64,6 +64,21 @@ function module.KW(keyword)
 end
 local KW = module.KW
 
+-- string literal
+local function escapeSequence(s)
+    return s:gsub(
+        "\\.",
+        {
+            ["\\"] = "\\",
+            ["'"] = "'",
+            ['"'] = '"',
+            ["n"] = "\n",
+            ["r"] = "\r",
+            ["t"] = "\t"
+        }
+    )
+end
+
 -- identifier --
 local geoalpha = S(translator.alphabet)
 local alpha = R("AZ", "az") + geoalpha
@@ -129,6 +144,11 @@ local op = tokens.op
 local sep = tokens.sep
 local delim = tokens.delim
 
+-- string literal --
+local doubleQuoteString = P('"') * C((P('\\"') + P("\\\\") + P(1) - P('"')) ^ 0) / escapeSequence * P('"') * endToken
+local singleQuoteString = P("'") * C((P("\\'") + P("\\\\") + P(1) - P("'")) ^ 0) / escapeSequence * P("'") * endToken
+local stringLiteral = doubleQuoteString + singleQuoteString
+
 -- abstract syntax tree --
 local function node(tag, ...)
     local labels = table.pack(...)
@@ -150,6 +170,7 @@ local nodeFunction = node("function", "name", "params", "defaultArgument", "bloc
 local nodeFunctionCall = node("functionCall", "name", "args")
 local nodeBlock = node("block", "body")
 local nodeLocalVariable = node("local", "name", "init")
+local nodeString = node("string", "value")
 
 local function nodeStatementSequence(first, rest)
     -- When first is empty, rest is nil, so we return an empty statement.
@@ -277,6 +298,7 @@ local grammar = {
         foldNewArray +
         functionCall +
         writeTarget +
+        stringLiteral / nodeString +
         numeral / nodeNumeral +
         boolean +
         delim.openFactor * expression * delim.closeFactor,
@@ -294,7 +316,7 @@ local grammar = {
 
 function module.parse(input, pegdebug)
     if pegdebug then
-        grammar = require("helper.pegdebug").trace(grammar)
+        grammar = require("ena.helper.pegdebug").trace(grammar)
     end
     grammar = lpeg.P(grammar)
     common.clearFurthestMatch()
