@@ -165,6 +165,7 @@ local nodeReturn = node("return", "sentence")
 local nodeNumeral = node("number", "value")
 local nodeIf = node("if", "expression", "block", "elseBlock")
 local nodeBoolean = node("boolean", "value")
+local nodeNil = node("nil")
 local nodeWhile = node("while", "expression", "block")
 local nodeFunction = node("function", "name", "params", "defaultArgument", "block")
 local nodeFunctionCall = node("functionCall", "name", "args")
@@ -271,7 +272,8 @@ local grammar = {
         nodeFunctionCall,
     funcArgs = Ct((expression * (delim.functionParameterSeparator * expression) ^ 0) ^ -1),
     writeTarget = Ct(variable * (delim.openArray * expression * delim.closeArray) ^ 0) / foldArrayElement,
-    statement = blockStatement + functionCall + writeTarget * op.assign * expression * -delim.openBlock / nodeAssignment +
+    statement = blockStatement + functionCall +
+        writeTarget * (op.assign * expression) ^ -1 * -delim.openBlock / nodeAssignment +
         (KW "local" + KW(translator.kwords.longForm.keyLocal) + KW(translator.kwords.shortForm.keyLocal)) * identifier *
             (op.assign * expression) ^ -1 /
             nodeLocalVariable +
@@ -301,6 +303,7 @@ local grammar = {
         stringLiteral / nodeString +
         numeral / nodeNumeral +
         boolean +
+        (KW "nil" + KW(translator.values.longForm.valNil) + KW(translator.values.shortForm.valNil)) / nodeNil +
         delim.openFactor * expression * delim.closeFactor,
     exponentExpr = primary * (op.exponent * exponentExpr) ^ -1 / addExponentOp,
     unaryExpr = op.unarySign * unaryExpr / addUnaryOp + exponentExpr,

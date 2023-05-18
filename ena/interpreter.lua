@@ -121,6 +121,10 @@ function Interpreter:run(code)
             pc = pc + 1
             self.top = self.top + 1
             self.stack[self.top] = code[pc]
+        elseif code[pc] == "pushNil" then
+            self:traceTwoCodes(code, pc)
+            self.top = self.top + 1
+            self.stack[self.top] = nil
         elseif code[pc] == "pop" then
             self:traceTwoCodes(code, pc)
             pc = pc + 1

@@ -132,6 +132,8 @@ function Compiler:codeExpression(ast)
     if ast.tag == "number" or ast.tag == "boolean" or ast.tag == "string" then
         self:addCode("push")
         self:addCode(ast.value)
+    elseif ast.tag == "nil" then
+            self:addCode("pushNil")
     elseif ast.tag == "variable" then
         local idx = self:findLocal(ast.value)
         if idx then
@@ -193,7 +195,11 @@ function Compiler:codeAssignment(ast)
                     ' "' .. ast.writeTarget.value .. '"'
             )
         end
-        self:codeExpression(ast.assignment)
+        if ast.assignment then
+            self:codeExpression(ast.assignment)
+        else
+            self:addCode("pushNil")
+        end
         local idx = self:findLocal(ast.writeTarget.value)
         if idx then
             self:addCode("storeLocal")
@@ -259,8 +265,7 @@ function Compiler:codeStatement(ast)
         if ast.init then
             self:codeExpression(ast.init)
         else
-            self:addCode("push")
-            self:addCode(0)
+            self:addCode("pushNil")
         end
         self.locals[#self.locals + 1] = ast.name
     elseif ast.tag == "if" then
@@ -336,8 +341,7 @@ function Compiler:codeFunction(ast)
     end
     self:codeStatement(ast.block)
     if functionCode[#functionCode] ~= "return" then
-        self:addCode("push")
-        self:addCode(0)
+        self:addCode("pushNil")
         self:addCode("return")
         self:addCode(#self.locals + #self.params)
     end

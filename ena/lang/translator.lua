@@ -44,6 +44,10 @@ module.values.shortForm.valTrue = "ჭეშ"
 module.values.longForm.valFalse = "მცდარი"
 module.values.shortForm.valFalse = "მც"
 
+-- custom language nil values --
+module.values.longForm.valNil = "ცარიელი"
+module.values.shortForm.valNil = "ცარ"
+
 -- error messages --
 module.err.unknownArg = "უცნობი არგუმენტი"
 module.err.noInputFile = "ფაილი ვერ მოიძებნა"

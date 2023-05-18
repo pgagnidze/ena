@@ -145,6 +145,9 @@ local handlers = {
     ["string"] = function(transpiler, node, indentLevel, indent)
         return '"' .. node.value .. '"'
     end,
+    ["nil"] = function(transpiler, node, indentLevel, indent)
+        return "nil"
+    end,
     ["print"] = function(transpiler, node, indentLevel, indent)
         return indent .. "print(" .. transpiler:transpile(node.toPrint, indentLevel) .. ")"
     end,
@@ -189,7 +192,7 @@ function Transpiler:transpile(node, indentLevel)
     indentLevel = indentLevel or 0
     local indent = string.rep(" ", indentLevel * 4)
     if node == nil then
-        error("Attempted to transpile nil node.")
+        return "nil"
     end
     local handler = handlers[node.tag]
     if handler then

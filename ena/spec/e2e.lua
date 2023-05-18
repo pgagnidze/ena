@@ -197,11 +197,11 @@ function module:testAssignmentAndReturn()
 end
 
 function module:testEmptyStatements()
-    lu.assertEquals(self:endToEnd(";;;;", true), 0)
+    lu.assertEquals(self:endToEnd(";;;;", true), nil)
 end
 
 function module:testEmptyInput()
-    lu.assertEquals(self:endToEnd("", true), 0)
+    lu.assertEquals(self:endToEnd("", true), nil)
 end
 
 function module:testStackedUnaryOperators()
@@ -259,10 +259,19 @@ function module:testBlockAndLineComments()
 end
 
 function module:testKeywordExcludeRules()
-    lu.assertEquals(module.parse(wrapWithEntrypoint "return1"), nil)
-    lu.assertEquals(module.parse(wrapWithEntrypoint "a = 1; returna"), nil)
-    lu.assertEquals(module.parse(wrapWithEntrypoint "return = 1"), nil)
-    lu.assertEquals(module.parse(wrapWithEntrypoint "return return"), nil)
+    local tests = {
+        {input = "return1 = 1; return return1", expected = 1},
+        {input = "a = 1; returna", expected = nil},
+        {input = "return = 1", expected = "Parsing failed"},
+        {input = "return return", expected = "Parsing failed"}
+    }
+    for i, testCase in ipairs(tests) do
+        lu.assertEquals(
+            self:endToEnd(testCase.input, true),
+            testCase.expected,
+            "Test case " .. i .. " failed"
+        )
+    end
 end
 
 function module:testNot()
@@ -445,6 +454,23 @@ function module:testStringLiteralsReturn()
             ]]
         ),
         "string literals"
+    )
+end
+
+function module:testNilValues()
+    lu.assertEquals(
+        self:endToEnd(
+            [[
+            function a() {
+                b;
+                return b
+            }
+            function main() {
+                return a();
+            }
+            ]]
+        ),
+        nil
     )
 end
 
