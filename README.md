@@ -1,7 +1,9 @@
 ![test status](https://github.com/pgagnidze/ena/workflows/test/badge.svg)
 
 # ენა - Ena
-<img style="display:block;float:none;margin-left:auto;margin-right:auto;width:60%;border:10px;border-radius:10px;" src="example.png" /><br/>
+<p align="center">
+  <img src="example.png" alt="Example Image" width="60%" style="border-radius: 10px;">
+</p>
 
 ენა მიზნად ისახავს, ქართველებისთვის ხელმისაწვდომი გახადოს პროგრამირება, რაც გულისხმობს მშობლიურ ენაზე კოდის წერას. ენა იყენებს პოპულარული, ფართოდ გავრცელებული ენების სინტაქსს, რაც დაგვეხმარება მარტივად შევისწავლოთ პროგრამული ენის მახასიათებლები.
 
