@@ -73,7 +73,7 @@ In addition to the transpiler capability, I have introduced several new features
 
 ## Installation
 1. Install [Lua](https://www.lua.org/start.html#installing) and [LuaRocks](https://github.com/luarocks/luarocks/wiki/Download)
-2. Install Ena with Luarocks - `$ luarocks install ena`
+2. Install Ena with LuaRocks - `$ luarocks install ena`
 3. (optional) Install VS Code [Extension](https://marketplace.visualstudio.com/items?itemName=pgagnidze.ena) for syntax highlighting
 
 ## Usage
