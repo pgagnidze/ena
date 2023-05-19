@@ -1,45 +1,10 @@
 local module = {}
 local Transpiler = {}
+local translator = require "ena.lang.translator"
 
 function Transpiler:new()
     return setmetatable({}, {__index = self})
 end
-
-local georgianToEnglish = {
-    ["ა"] = "a",
-    ["ბ"] = "b",
-    ["გ"] = "g",
-    ["დ"] = "d",
-    ["ე"] = "e",
-    ["ვ"] = "v",
-    ["ზ"] = "z",
-    ["თ"] = "th",
-    ["ი"] = "i",
-    ["კ"] = "k",
-    ["ლ"] = "l",
-    ["მ"] = "m",
-    ["ნ"] = "n",
-    ["ო"] = "o",
-    ["პ"] = "p",
-    ["ჟ"] = "zh",
-    ["რ"] = "r",
-    ["ს"] = "s",
-    ["ტ"] = "t",
-    ["უ"] = "u",
-    ["ფ"] = "f",
-    ["ქ"] = "q",
-    ["ღ"] = "gh",
-    ["ყ"] = "qh",
-    ["შ"] = "sh",
-    ["ჩ"] = "ch",
-    ["ც"] = "ts",
-    ["ძ"] = "dz",
-    ["წ"] = "ts",
-    ["ჭ"] = "tch",
-    ["ხ"] = "kh",
-    ["ჯ"] = "j",
-    ["ჰ"] = "h"
-}
 
 local handlers = {
     ["function"] = function(transpiler, node, indentLevel, indent)
@@ -182,7 +147,7 @@ local handlers = {
 }
 
 local function replaceGeorgianCharacters(luaCode)
-    for georgian, english in pairs(georgianToEnglish) do
+    for georgian, english in pairs(translator.toeng) do
         luaCode = luaCode:gsub(georgian, english)
     end
     return luaCode

@@ -1,6 +1,6 @@
 local module = {}
 local translator = require "ena.lang.translator"
-local common = require("ena.helper.common")
+local common = require "ena.helper.common"
 
 local Interpreter = {}
 
@@ -67,7 +67,8 @@ end
 
 function Interpreter:traceBinaryOp(operator)
     if self.trace then
-        self.trace[#self.trace + 1] = operator .. " " .. tostring(self.stack[self.top - 1]) .. " " .. tostring(self.stack[self.top])
+        self.trace[#self.trace + 1] =
+            operator .. " " .. tostring(self.stack[self.top - 1]) .. " " .. tostring(self.stack[self.top])
     end
 end
 

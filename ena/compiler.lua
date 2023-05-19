@@ -133,7 +133,7 @@ function Compiler:codeExpression(ast)
         self:addCode("push")
         self:addCode(ast.value)
     elseif ast.tag == "nil" then
-            self:addCode("pushNil")
+        self:addCode("pushNil")
     elseif ast.tag == "variable" then
         local idx = self:findLocal(ast.value)
         if idx then

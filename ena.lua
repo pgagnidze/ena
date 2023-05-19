@@ -1,6 +1,6 @@
 #!/usr/bin/env lua
 
-package.path = package.path .. ';ena/?.lua'
+package.path = package.path .. ";ena/?.lua"
 
 local common = require "ena.helper.common"
 local parser = require "ena.parser"
@@ -163,11 +163,9 @@ end
 -- transpile --
 if show.transpile then
     local transpiledCode = transpiler.transpile(ast)
-    io.stdout:write((show.transpile and translator.success.showTranspile or "Transpiled") .. ":\n", tostring(transpiledCode), "\n\n")
+    io.stdout:write(
+        (show.transpile and translator.success.showTranspile or "Transpiled") .. ":\n",
+        tostring(transpiledCode),
+        "\n\n"
+    )
 end
-
---[[
-Todo:
-- String literals
-- Dictionaries
-]]
