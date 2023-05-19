@@ -149,5 +149,5 @@ Simultaneously, I would ensure that the language remains approachable for learni
 
 - [Moonscript](https://github.com/leafo/moonscript)
 - [Testing Lua projects with GitHub Actions](https://leafo.net/guides/testing-lua-modules-with-github-actions.html)
-- Mab programming language by Mark W. Gabby-Li
+- [Mab programming language by Mark W. Gabby-Li](https://github.com/mwgabby-li/Mab)
 - [Syntax Highlight Guide](https://code.visualstudio.com/api/language-extensions/syntax-highlight-guide)
