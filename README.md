@@ -99,4 +99,4 @@ main()
 
 ## ♥
 - Roberto Ierusalimschy-ის პროგრამირების ენის შემსწავლელი კურსის საბოლოო პროექტი ([report](./NOTES.md))
-- Mark W. Gabby-Li-ის Mab პროგრამირების ენაზე დაფუძნებული
+- Mark W. Gabby-Li-ის [Mab](https://github.com/mwgabby-li/Mab) პროგრამირების ენაზე დაფუძნებული
