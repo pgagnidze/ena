@@ -74,5 +74,6 @@ module.success.showAST = "აბსტრაქტული სინტაქ�
 module.success.showCode = "დაგენერირებული კოდი"
 module.success.showTrace = "ტრეისის ჩვენება"
 module.success.showResult = "შედეგი"
+module.success.showTranspile = "ტრანსპილირებული კოდი"
 
 return module
