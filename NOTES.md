@@ -118,6 +118,8 @@ main()
 To prepare this project for production, I would add modules, for loops, and dictionaries.
 These additions would allow for easier resolution of various algorithmic challenges and enhance the overall functionality of the project.
 
+I have one concern that arises during the transpilation process, which is the difference in reserved words between Ena and Lua. Certain words reserved in Ena may have different meanings or uses in Lua, and vice versa. This disparity can create challenges when converting Ena code into Lua code. One specific concern is when a user employs a keyword, not reserved in Ena, such as "end," as a variable. After transpilation, the converted code may assign a value to "end," leading to unexpected errors. To address this, it is crucial to handle such cases carefully and resolve conflicts between reserved keywords and user-defined variables appropriately during transpilation.
+
 > How would you extend this project to do something more? Are there other features you’d like? How would you go about adding them?
 
 To expand the capabilities of this project, my first step would be to focus on making the syntax more user-friendly and easily understandable for Georgian users.
