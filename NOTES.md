@@ -1,4 +1,10 @@
+![test status](https://github.com/pgagnidze/ena/workflows/test/badge.svg)
+
 # Final Project Report: Ena
+
+<p align="center">
+  <img src="example.png" alt="Example Ena Image" width="60%"">
+</p>
 
 This language aims to make programming more accessible for Georgians by allowing them to write code in their native language.
 Ena uses the syntax of popular, widely-used languages, modified to use the Georgian alphabet and keywords.
