@@ -57,6 +57,8 @@ function main() {
 
 You can check the [tests](./ena/spec/e2e.lua) for more examples. You can run all the tests with `$ ena --tests` command.
 
+Execute the [input.ena](./example/input.ena) for the input program. `input.ena` has comments to explain the syntax briefly.
+
 ## New Features
 
 The design choices remain consistent with the principles discussed in the lectures and exercises,

@@ -71,7 +71,7 @@ local handlers = {
     ["while"] = function(transpiler, node, indentLevel, indent)
         local condition = transpiler:transpile(node.expression, indentLevel)
         local body = transpiler:transpile(node.block.body, indentLevel + 1)
-        return indent .. "while " .. condition .. " do\n" .. body .. "\n" .. indent .. "end"
+        return indent .. "while " .. condition .. " do\n" .. body .. "\n" .. indent .. "end\n"
     end,
     ["arrayElement"] = function(transpiler, node, indentLevel, indent)
         local array = transpiler:transpile(node.array, indentLevel)
@@ -81,6 +81,18 @@ local handlers = {
     ["newArray"] = function(transpiler, node, indentLevel, indent)
         local size = transpiler:transpile(node.size, indentLevel)
         local initialValue = transpiler:transpile(node.initialValue, indentLevel)
+        if type(size) == "string" then
+            -- We use 'size' as a string expression to dynamically determine the size of the table
+            -- We use a metatable to provide a default value for all indices up to size
+            -- Note: This assumes that 'size' is a valid Lua expression and that it evaluates to a number
+            return "(function()\n" ..
+                indent .. "    local t = setmetatable({}, {__index = function() return " .. initialValue .. " end})\n" ..
+                indent .. "    for i = 1, " .. size .. " do\n" ..
+                indent .. "        t[i] = " .. initialValue .. "\n" ..
+                indent .. "    end\n" ..
+                indent .. "    return t\n" ..
+                indent .. "end)()"
+        end
         local arrayElements = {}
         for _ = 1, size do
             table.insert(arrayElements, initialValue)

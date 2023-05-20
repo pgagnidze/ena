@@ -1,0 +1,31 @@
+function fibonacci(n = 20) {                    # function declaration with default parameter
+     if n == 0 {                                # if statement with a block
+        return 0;                               # return statement with an expression
+     } elseif n == 1 {                          # elseif statement with a block
+        return 1;                               # return statement with an expression
+     } else {                                   # else statement with a block
+        local fib = new [n + 2] 0;              # array initialization of n+2 elements, all initialized to 0 
+        fib[1] = 0;                             # array indexing with an assignment
+        fib[2] = 1;                             # array indexing with an assignment
+        local i = 3;                            # local variable declaration with an assignment
+        while i <= n + 1 {                      # while statement with a block
+            fib[i] = fib[i - 1] + fib[i - 2];   # array indexing with an assignment and an expression
+            i = i + 1;                          # assignment with an expression
+        };                                      # end of while statement
+        return fib[n + 1];                      # return statement with an expression
+    }                                           # end of if statement
+}                                               # end of function
+
+#{
+    multi-line comment the first 10 fibonacci numbers
+    0 1 1 2 3 5 8 13 21 34
+#}
+
+function main() {                               # entrypoint function declaration with no parameter
+    local number = 10;                          # local variable declaration with an assignment
+    local i = 1;                                # local variable declaration with an assignment
+    while i <= number {                         # while statement with a block
+        @ fibonacci(i - 1);                     # function call with an expression
+        i = i + 1;                              # assignment with an expression
+    }                                           # end of while statement
+}                                               # end of entrypoint function
