@@ -137,7 +137,7 @@ Simultaneously, I would ensure that the language remains approachable for learni
 | Criteria | Score |
 | -------- | -------- |
 | Language Completeness  | 2  |
-| Code Quality & Report| 3  |
+| Code Quality & Report| 2  |
 | Originality & Scope| 2  |
 
 > Have you gone beyond the base requirements? How so?
