@@ -136,6 +136,8 @@ I have one concern that arises during the transpilation process, which is the di
 To expand the capabilities of this project, my first step would be to focus on making the syntax more user-friendly and easily understandable for Georgian users.
 Simultaneously, I would ensure that the language remains approachable for learning purposes.
 
+Check out the [Issues](https://github.com/pgagnidze/ena/issues) for more details about the Ena roadmap.
+
 ## Self assessment
 | Criteria | Score |
 | -------- | -------- |
