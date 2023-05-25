@@ -6,6 +6,7 @@ module.entryPointName = "main"
 --  operators --
 module.op.assign = "="
 module.op.print = "@"
+module.op.exec = "$"
 
 -- binary operators --
 module.op.add = "+"

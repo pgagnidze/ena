@@ -298,6 +298,14 @@ function Interpreter:run(code)
             self:traceStack()
             pc = pc + 1
             self:run(code[pc])
+        elseif code[pc] == "exec" then
+            self:traceTwoCodes(code, pc)
+            local command = self.stack[self.top]
+            local file = assert(io.popen(command, 'r'), "failed to execute command " .. command)
+            local output = file:read('*all')
+            output = string.gsub(output, '^%s*(.-)%s*$', '%1')
+            file:close()
+            self.stack[self.top] = output
         else
             error("unknown instruction " .. code[pc] .. " at " .. pc)
         end

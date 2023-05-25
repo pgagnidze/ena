@@ -59,6 +59,8 @@ You can check the [tests](./ena/spec/e2e.lua) for more examples. You can run all
 
 Execute the [input.ena](./example/input.ena) for the input program. `input.ena` has comments to explain the syntax briefly.
 
+Check out the new [sysinfo.ena](./example/sysinfo.ena) program that shows various system informations for Linux and Darwin os.
+
 ## New Features
 
 The design choices remain consistent with the principles discussed in the lectures and exercises,
@@ -71,7 +73,8 @@ Additionally, the Lua code can be further transpiled into languages such as Pyth
 In addition to the transpiler capability, I have introduced several new features to the system:
 - Booleans,
 - Abscence of value (nil)
-- String literals (with concatenation)
+- String literals (with concatenation, use `+` sign)
+- Shell execution (with `$` operator)
 
 ## Installation
 1. Install [Lua](https://www.lua.org/start.html#installing) and [LuaRocks](https://github.com/luarocks/luarocks/wiki/Download)

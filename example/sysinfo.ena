@@ -1,0 +1,55 @@
+function main() {
+    local user = $("whoami");
+    local host = $("hostname");
+    local os = $("uname -s");
+    local kernel = $("uname -r");
+    local uptime = $("uptime | awk -F ', ' '{print $1}'");
+    local diskUsage = $("df -h / | awk 'NR==2{print $5}'");
+    local loadAverage = "";
+    local shell = $("basename ${SHELL}");
+
+    # Common Colors
+    local bold = $("tput bold");
+    local black = $("tput setaf 0");
+    local red = $("tput setaf 1");
+    local yellow = $("tput setaf 3");
+    local white = $("tput setaf 7");
+    local reset = $("tput sgr0");
+
+    # BSD Colors
+    local bsd_lc = reset + bold + red;
+    local bsd_nc = reset + bold + red;
+    local bsd_ic = reset + bold + white;
+    local bsd_c0 = reset + bold + red;
+    local bsd_c1 = reset + red;
+
+    # Linux Colors
+    local linux_lc = reset + bold + black;
+    local linux_nc = reset + bold + black;
+    local linux_ic = reset + bold + white;
+    local linux_c0 = reset + bold + black;
+    local linux_c1 = reset + white;
+    local linux_c2 = reset + yellow;
+
+    if (os == "Linux") {
+        loadAverage = $("cat /proc/loadavg | awk '{print $1, $2, $3}'");
+        @ linux_c0 + "      ___     " + linux_nc + user + linux_ic + "@" + linux_nc + host + reset;
+        @ linux_c0 + "     (" + linux_c1 + ".. " + linux_c0 + "\    " + linux_lc + "OS:         " + linux_ic + os + reset;
+        @ linux_c0 + "     (" + linux_c2 + "<> " + linux_c0 + "|    " + linux_lc + "KERNEL:     " + linux_ic + kernel + reset;
+        @ linux_c0 + "    /" + linux_c1 + "/  \ " + linux_c0 + "\   " + linux_lc + "UPTIME:     " + linux_ic + uptime + reset;
+        @ linux_c0 + "   ( " + linux_c1 + "|  | " + linux_c0 + "/|  " + linux_lc + "DISK:       " + linux_ic + diskUsage + reset;
+        @ linux_c2 + "  _" + linux_c0 + "/\ " + linux_c1 + "__)" + linux_c0 + "/" + linux_c2 + "_" + linux_c0 + ")  " + linux_lc + "AVG:        " + linux_ic + loadAverage + reset;
+        @ linux_c2 + "  \/" + linux_c0 + "-____" + linux_c2 + "\/   " + linux_lc + "SHELL:      " + linux_ic + shell + reset;
+    } elseif (os == "Darwin") {
+        loadAverage = $("sysctl -n vm.loadavg | awk '{print $2, $3, $4}'");
+        @ bsd_c0 + "   _  " + bsd_c1 + "_____  " + bsd_c0 + "_   " + bsd_nc + user + linux_ic + "@" + bsd_nc + host + reset;
+        @ bsd_c0 + "  / \`     `/ \  " + bsd_lc + "OS:        " + linux_ic + os + reset;
+        @ bsd_c0 + "  \/       (__/  " + bsd_lc + "KERNEL:    " + linux_ic + kernel + reset;
+        @ bsd_c1 + "  |           |  " + bsd_lc + "UPTIME:    " + linux_ic + uptime + reset;
+        @ bsd_c1 + "  |           |  " + bsd_lc + "DISK:      " + linux_ic + diskUsage + reset;
+        @ bsd_c1 + "   \         /   " + bsd_lc + "AVG:       " + linux_ic + loadAverage + reset;
+        @ bsd_c1 + "    `-_____-`    " + bsd_lc + "SHELL:     " + linux_ic + shell + reset;
+    } else {
+        @ "OS not supported."
+    }
+}

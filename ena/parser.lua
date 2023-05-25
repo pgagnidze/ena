@@ -138,6 +138,7 @@ tokens.op.comparison =
 tokens.op.unarySign = T(C(P(l.op.positive) + l.op.negate))
 tokens.op.not_ = T(C(l.op.not_))
 tokens.op.print = T(l.op.print)
+tokens.op.exec = T(l.op.exec)
 tokens.op.logical = T(C(l.op.and_) + C(l.op.or_))
 
 local op = tokens.op
@@ -161,6 +162,7 @@ end
 local nodeVariable = node("variable", "value")
 local nodeAssignment = node("assignment", "writeTarget", "assignment")
 local nodePrint = node("print", "toPrint")
+local nodeExec = node("exec", "command")
 local nodeReturn = node("return", "sentence")
 local nodeNumeral = node("number", "value")
 local nodeIf = node("if", "expression", "block", "elseBlock")
@@ -288,7 +290,8 @@ local grammar = {
             blockStatement /
             nodeWhile +
         (op.print + KW(translator.kwords.longForm.keyPrint) + KW(translator.kwords.shortForm.keyPrint)) * expression /
-            nodePrint,
+            nodePrint +
+        (op.exec) * expression / nodeExec,
     boolean = ((KW "true" + KW(translator.values.longForm.valTrue) + KW(translator.values.shortForm.valTrue)) * Cc(true) +
         (KW "false" + KW(translator.values.longForm.valFalse) + KW(translator.values.shortForm.valFalse)) * Cc(false)) /
         nodeBoolean,
@@ -303,6 +306,7 @@ local grammar = {
         stringLiteral / nodeString +
         numeral / nodeNumeral +
         boolean +
+        (op.exec) * expression / nodeExec +
         (KW "nil" + KW(translator.values.longForm.valNil) + KW(translator.values.shortForm.valNil)) / nodeNil +
         delim.openFactor * expression * delim.closeFactor,
     exponentExpr = primary * (op.exponent * exponentExpr) ^ -1 / addExponentOp,

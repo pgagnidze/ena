@@ -474,4 +474,17 @@ function module:testNilValues()
     )
 end
 
+function module:testShellExec()
+    lu.assertEquals(
+        self:endToEnd(
+            [[
+            function main() {
+                return $ 'echo "Hello World"'
+            }
+            ]]
+        ),
+        "Hello World"
+    )
+end
+
 return module
