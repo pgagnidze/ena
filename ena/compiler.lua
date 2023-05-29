@@ -153,7 +153,7 @@ function Compiler:codeExpression(ast)
         self:codeFunctionCall(ast)
     elseif ast.tag == "exec" then
         self:codeExpression(ast.command)
-        self:addCode("exec")
+        self:addCode("execExpression")
     elseif ast.tag == "arrayElement" then
         self:codeExpression(ast.array)
         self:codeExpression(ast.index)
@@ -303,7 +303,7 @@ function Compiler:codeStatement(ast)
         self:addCode("print")
     elseif ast.tag == "exec" then
         self:codeExpression(ast.command)
-        self:addCode("exec")
+        self:addCode("execStatement")
     else
         error('Unknown statement node tag "' .. ast.tag .. '."')
     end
