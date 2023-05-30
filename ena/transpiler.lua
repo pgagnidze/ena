@@ -187,7 +187,10 @@ function module.transpile(ast)
     end
     table.insert(luaCodeParts, "\nmain()")
     local luaCode = table.concat(luaCodeParts, "")
-    return replaceGeorgianCharacters(luaCode)
+    local georgianCharacters = replaceGeorgianCharacters(luaCode)
+    local replacedMain = string.gsub(georgianCharacters, "mthavari", "main")
+    return replacedMain
+
 end
 
 return module
