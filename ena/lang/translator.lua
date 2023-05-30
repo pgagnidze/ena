@@ -11,43 +11,43 @@ local module = {
 module.alphabet = "აბგდევზთიკლმნოპჟრსტუფქღყშჩცძწჭხჯჰ"
 
 -- custom language keywords --
-module.kwords.longForm.keyIf = "თუ"
+module.kwords.longForm.keyIf = "თუ ეს პირობა სრულდება"
 module.kwords.shortForm.keyIf = "თუ"
 
-module.kwords.longForm.keyElseIf = "თუარადა"
-module.kwords.shortForm.keyElseIf = "თად"
+module.kwords.longForm.keyElseIf = "სხვა შემთხვევაში შეამოწმე"
+module.kwords.shortForm.keyElseIf = "თუარადა"
 
-module.kwords.longForm.keyElse = "თუარა"
-module.kwords.shortForm.keyElse = "თარ"
+module.kwords.longForm.keyElse = "სხვა შემთხვევაში"
+module.kwords.shortForm.keyElse = "თუარა"
 
-module.kwords.longForm.keyReturn = "დააბრუნე"
-module.kwords.shortForm.keyReturn = "დაბ"
+module.kwords.longForm.keyReturn = "დააბრუნე ეს მნიშვნელობა"
+module.kwords.shortForm.keyReturn = "დააბრუნე"
 
-module.kwords.longForm.keyWhile = "სანამ"
-module.kwords.shortForm.keyWhile = "სნ"
+module.kwords.longForm.keyWhile = "სანამ ეს პირობა სრულდება გაიმეორე"
+module.kwords.shortForm.keyWhile = "სანამ"
 
-module.kwords.longForm.keyPrint = "მაჩვენე"
-module.kwords.shortForm.keyPrint = "მჩ"
+module.kwords.longForm.keyPrint = "მაჩვენე ეს მნიშვნელობა ეკრანზე"
+module.kwords.shortForm.keyPrint = "მაჩვენე"
 
 module.kwords.longForm.keyNew = "ახალი"
-module.kwords.shortForm.keyNew = "ახ"
+module.kwords.shortForm.keyNew = "ახალი"
 
-module.kwords.longForm.keyFunction = "ფუნქცია"
-module.kwords.shortForm.keyFunction = "ფუნ"
+module.kwords.longForm.keyFunction = "ფუნქცია სახელად"
+module.kwords.shortForm.keyFunction = "ფუნქცია"
 
-module.kwords.longForm.keyLocal = "ლოკალური"
-module.kwords.shortForm.keyLocal = "ლოკ"
+module.kwords.longForm.keyLocal = "ლოკალური ცვლადი"
+module.kwords.shortForm.keyLocal = "ლოკალური"
 
 -- custom language boolean values --
-module.values.longForm.valTrue = "ჭეშმარიტი"
-module.values.shortForm.valTrue = "ჭეშ"
+module.values.longForm.valTrue = "ჭეშმარიტი მნიშვნელობა"
+module.values.shortForm.valTrue = "ჭეშმარიტი"
 
-module.values.longForm.valFalse = "მცდარი"
-module.values.shortForm.valFalse = "მც"
+module.values.longForm.valFalse = "მცდარი მნიშვნელობა"
+module.values.shortForm.valFalse = "მცდარი"
 
 -- custom language nil values --
-module.values.longForm.valNil = "ცარიელი"
-module.values.shortForm.valNil = "ცარ"
+module.values.longForm.valNil = "ცარიელი მნიშვნელობა"
+module.values.shortForm.valNil = "ცარიელი"
 
 -- error messages --
 module.err.unknownArg = "უცნობი არგუმენტი"
