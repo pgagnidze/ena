@@ -357,7 +357,14 @@ function Compiler:compile(ast)
     for i = 1, #ast do
         self:codeFunction(ast[i])
     end
-    local entryPoint = self.functions[literals.entryPointName]
+
+    local entryPoint;
+    if self.functions[literals.entryPointName] then
+        entryPoint = self.functions[literals.entryPointName]
+    elseif self.functions[literals.entryPointNameGeo] then
+        entryPoint = self.functions[literals.entryPointNameGeo]
+    end
+
     if not entryPoint then
         error(self.translate and translator.err.compileErrNoEntryPointFound or "No entrypoint found")
     end

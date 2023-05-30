@@ -2,6 +2,7 @@ local module = {op = {}, delim = {}, sep = {}, comments = {}}
 
 --  entrypoint --
 module.entryPointName = "main"
+module.entryPointNameGeo = "მთავარი"
 
 --  operators --
 module.op.assign = "="
