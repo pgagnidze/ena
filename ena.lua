@@ -20,7 +20,7 @@ if arg[1] == "--help" or arg[1] == "-h" then
         {"--trace", "-t", "Trace the program."},
         {"--result", "-r", "Show the result."},
         {"--pegdebug", "-p", "Run the PEG debugger."},
-        {"--transpile", "-tp", "Transpile to Lua."},
+        {"--transpile", "-tp", "Transpile to Lua. (experimental)"},
         {"--translate", "-tr", "Translate messages to Georgian."}
     }
 
@@ -93,11 +93,12 @@ if arg[1] == nil then
         [[
 ენა - Ena
 
+პირველი ქართული პროგრამული ენა.
+შეიყვანე კოდი ქვემოთ და დააჭირე Ctrl+D რომ გაეშვას.
+
 the first Georgian programming language.
 Enter the code here and press Ctrl+D to run it.
 
-პირველი ქართული პროგრამული ენა.
-შეიყვანე კოდი ქვემოთ და დააჭირე Ctrl+D რომ გაეშვას.
     ]] ..
             "\n"
     )
