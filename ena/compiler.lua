@@ -350,9 +350,16 @@ function Compiler:collectFunctions(ast)
     for i = 1, #ast do
         local functionDeclaration = ast[i]
         if not self.functions[functionDeclaration.name] then
-            self.functions[functionDeclaration.name] = {code = {}, params = functionDeclaration.params, defaultArgument = functionDeclaration.defaultArgument}
+            self.functions[functionDeclaration.name] = {
+                code = {},
+                params = functionDeclaration.params,
+                defaultArgument = functionDeclaration.defaultArgument
+            }
         else
-            error("Duplicate function name '" .. functionDeclaration.name .. "()'")
+            error(
+                (self.translate and translator.err.compileErrDuplicateFunctionName or "Duplicate function name") ..
+                    ' "' .. functionDeclaration.name .. '()"'
+            )
         end
     end
 end
@@ -364,7 +371,7 @@ function Compiler:compile(ast)
         self:codeFunction(ast[i])
     end
 
-    local entryPoint;
+    local entryPoint
     if self.functions[literals.entryPointName] then
         entryPoint = self.functions[literals.entryPointName]
     elseif self.functions[literals.entryPointNameGeo] then

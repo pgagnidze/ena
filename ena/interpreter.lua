@@ -258,14 +258,14 @@ function Interpreter:run(code)
         elseif code[pc] == "jumpIfFalse" then
             self:traceTwoCodesAndStack(code, pc)
             pc = pc + 1
-            if not self.stack[self.top] then
+            if self.stack[self.top] == false or self.stack[self.top] == nil or self.stack[self.top] == 0 then
                 pc = pc + code[pc]
             end
             self:popStack(1)
         elseif code[pc] == "jumpIfFalseJumpNoPop" then
             self:traceTwoCodesAndStack(code, pc)
             pc = pc + 1
-            if not self.stack[self.top] then
+            if self.stack[self.top] == false or self.stack[self.top] == nil or self.stack[self.top] == 0 then
                 pc = pc + code[pc]
             else
                 self:popStack(1)
@@ -273,7 +273,7 @@ function Interpreter:run(code)
         elseif code[pc] == "jumpIfTrueJumpNoPop" then
             self:traceTwoCodesAndStack(code, pc)
             pc = pc + 1
-            if self.stack[self.top] then
+            if self.stack[self.top] and self.stack[self.top] ~= 0 then
                 pc = pc + code[pc]
             else
                 self:popStack(1)
