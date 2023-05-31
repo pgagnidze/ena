@@ -14,7 +14,7 @@ module.alphabet = "აბგდევზთიკლმნოპჟრსტუ�
 module.kwords.longForm.keyIf = "თუ პირობა სრულდება"
 module.kwords.shortForm.keyIf = "თუ"
 
-module.kwords.longForm.keyElseIf = "სხვა შემთხვევაში შეამოწმე"
+module.kwords.longForm.keyElseIf = "სხვა შემთხვევაში შეამოწმე თუ"
 module.kwords.shortForm.keyElseIf = "თუარადა"
 
 module.kwords.longForm.keyElse = "სხვა შემთხვევაში"

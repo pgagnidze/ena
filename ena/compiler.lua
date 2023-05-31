@@ -20,7 +20,9 @@ local toName = {
     [lop.notEqual] = "notEqual",
     [lop.not_] = "not",
     [lop.and_] = "and",
-    [lop.or_] = "or"
+    [lop.or_] = "or",
+    [lop.and_geo] = "and",
+    [lop.or_geo] = "or"
 }
 
 local unaryToName = {
@@ -163,12 +165,12 @@ function Compiler:codeExpression(ast)
         self:codeExpression(ast.size)
         self:addCode("newArray")
     elseif ast.tag == "binaryOp" then
-        if ast.op == lop.and_ then
+        if ast.op == lop.and_ or ast.op == lop.and_geo then
             self:codeExpression(ast.firstChild)
             local fixupSSAnd = self:addJump("jumpIfFalseJumpNoPop")
             self:codeExpression(ast.secondChild)
             self:fixupJump(fixupSSAnd)
-        elseif ast.op == lop.or_ then
+        elseif ast.op == lop.or_ or ast.op == lop.or_geo then
             self:codeExpression(ast.firstChild)
             local fixupSSOr = self:addJump("jumpIfTrueJumpNoPop")
             self:codeExpression(ast.secondChild)

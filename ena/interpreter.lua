@@ -301,9 +301,9 @@ function Interpreter:run(code)
         elseif code[pc] == "execExpression" then
             self:traceTwoCodes(code, pc)
             local command = self.stack[self.top]
-            local file = assert(io.popen(command, 'r'), "failed to execute command " .. command)
-            local output = file:read('*all')
-            output = string.gsub(output, '^%s*(.-)%s*$', '%1')
+            local file = assert(io.popen(command, "r"), "failed to execute command " .. command)
+            local output = file:read("*all")
+            output = string.gsub(output, "^%s*(.-)%s*$", "%1")
             file:close()
             self.stack[self.top] = output
         elseif code[pc] == "execStatement" then

@@ -377,9 +377,9 @@ function module:testArrays()
                 array = new [2][2] 1;
                 array[1][1] = 0;
                 test = 0;
-                test = test & array[1][2];
-                test = test & array[2][1];
-                test = test & array[2][2];
+                test = test && array[1][2];
+                test = test && array[2][1];
+                test = test && array[2][2];
                 return test
             }
             ]]

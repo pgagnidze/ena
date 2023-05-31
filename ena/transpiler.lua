@@ -120,6 +120,7 @@ local handlers = {
         return node.value
     end,
     ["string"] = function(transpiler, node, indentLevel, indent)
+        -- TODO: replace \ with \\ and " with \"
         return '"' .. node.value .. '"'
     end,
     ["nil"] = function(transpiler, node, indentLevel, indent)
@@ -127,6 +128,14 @@ local handlers = {
     end,
     ["print"] = function(transpiler, node, indentLevel, indent)
         return indent .. "print(" .. transpiler:transpile(node.toPrint, indentLevel) .. ")"
+    end,
+    ["exec"] = function(transpiler, node, indentLevel, indent)
+        return "(function()\n" ..
+            indent .. '    local command = ' .. transpiler:transpile(node.command, indentLevel) .. '\n' ..
+            indent .. '    local file = assert(io.popen(command, "r"), "failed to execute command " .. command)\n' ..
+            indent .. '    local output = file:read("*all")\n' ..
+            indent .. '    return string.gsub(output, "^%s*(.-)%s*$", "%1")\n' ..
+            indent .. "end)()"
     end,
     ["variable"] = function(transpiler, node, indentLevel, indent)
         return node.value
@@ -136,12 +145,16 @@ local handlers = {
     end,
     ["binaryOp"] = function(transpiler, node, indentLevel, indent)
         local op = node.op
-        if op == "&" then
+        if op == "&&" then
             op = "and"
-        elseif op == "|" then
+        elseif op == "||" then
             op = "or"
         elseif op == "!=" then
             op = "~="
+        elseif op == "+" then -- TODO: handle variables that can be strings or numbers
+            if node.firstChild.tag == "string" or node.secondChild.tag == "string" then
+                op = ".."
+            end
         end
         return transpiler:transpile(node.firstChild, indentLevel) ..
             " " .. op .. " " .. transpiler:transpile(node.secondChild, indentLevel)
