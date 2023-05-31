@@ -11,7 +11,7 @@ local module = {
 module.alphabet = "აბგდევზთიკლმნოპჟრსტუფქღყშჩცძწჭხჯჰ"
 
 -- custom language keywords --
-module.kwords.longForm.keyIf = "თუ ეს პირობა სრულდება"
+module.kwords.longForm.keyIf = "თუ პირობა სრულდება"
 module.kwords.shortForm.keyIf = "თუ"
 
 module.kwords.longForm.keyElseIf = "სხვა შემთხვევაში შეამოწმე"
@@ -20,14 +20,17 @@ module.kwords.shortForm.keyElseIf = "თუარადა"
 module.kwords.longForm.keyElse = "სხვა შემთხვევაში"
 module.kwords.shortForm.keyElse = "თუარა"
 
-module.kwords.longForm.keyReturn = "დააბრუნე ეს მნიშვნელობა"
+module.kwords.longForm.keyReturn = "დააბრუნე მნიშვნელობა"
 module.kwords.shortForm.keyReturn = "დააბრუნე"
 
-module.kwords.longForm.keyWhile = "სანამ ეს პირობა სრულდება გაიმეორე"
+module.kwords.longForm.keyWhile = "სანამ პირობა სრულდება გაიმეორე"
 module.kwords.shortForm.keyWhile = "სანამ"
 
-module.kwords.longForm.keyPrint = "მაჩვენე ეს მნიშვნელობა ეკრანზე"
+module.kwords.longForm.keyPrint = "მაჩვენე მნიშვნელობა ეკრანზე"
 module.kwords.shortForm.keyPrint = "მაჩვენე"
+
+module.kwords.longForm.keyExec = "გაუშვი ბრძანება"
+module.kwords.shortForm.keyExec = "ბრძანება"
 
 module.kwords.longForm.keyNew = "ახალი"
 module.kwords.shortForm.keyNew = "ახალი"

@@ -247,14 +247,26 @@ local functionCall = lpeg.V "functionCall"
 local funcParams = lpeg.V "funcParams"
 local funcArgs = lpeg.V "funcArgs"
 
+local KW_function =
+    (KW "function" + KW(translator.kwords.longForm.keyFunction) + KW(translator.kwords.shortForm.keyFunction))
+local KW_elseif = (KW "elseif" + KW(translator.kwords.longForm.keyElseIf) + KW(translator.kwords.shortForm.keyElseIf))
+local KW_else = (KW "else" + KW(translator.kwords.longForm.keyElse) + KW(translator.kwords.shortForm.keyElse))
+local KW_local = (KW "local" + KW(translator.kwords.longForm.keyLocal) + KW(translator.kwords.shortForm.keyLocal))
+local KW_if = (KW "if" + KW(translator.kwords.longForm.keyIf) + KW(translator.kwords.shortForm.keyIf))
+local KW_return = (KW "return" + KW(translator.kwords.longForm.keyReturn) + KW(translator.kwords.shortForm.keyReturn))
+local KW_while = (KW "while" + KW(translator.kwords.longForm.keyWhile) + KW(translator.kwords.shortForm.keyWhile))
+local kW_print = (op.print + KW(translator.kwords.longForm.keyPrint) + KW(translator.kwords.shortForm.keyPrint))
+local KW_exec = (op.exec + KW(translator.kwords.longForm.keyExec) + KW(translator.kwords.shortForm.keyExec))
+local KW_true = (KW "true" + KW(translator.values.longForm.valTrue) + KW(translator.values.shortForm.valTrue))
+local KW_false = (KW "false" + KW(translator.values.longForm.valFalse) + KW(translator.values.shortForm.valFalse))
+local KW_new = (KW "new" + KW(translator.kwords.longForm.keyNew) + KW(translator.kwords.shortForm.keyNew))
+local KW_nil = (KW "nil" + KW(translator.values.longForm.valNil) + KW(translator.values.shortForm.valNil))
+
 local Ct = lpeg.Ct
 local grammar = {
     "program",
     program = endToken * Ct(funcDec ^ 1) * -1,
-    funcDec = (KW "function" + KW(translator.kwords.longForm.keyFunction) + KW(translator.kwords.shortForm.keyFunction)) *
-        identifier *
-        delim.openFunctionParameterList *
-        funcParams *
+    funcDec = KW_function * identifier * delim.openFunctionParameterList * funcParams *
         ((op.assign * expression) + Cc({})) *
         delim.closeFunctionParameterList *
         (blockStatement + sep.statement) /
@@ -262,13 +274,7 @@ local grammar = {
     funcParams = Ct((identifier * (delim.functionParameterSeparator * identifier) ^ 0) ^ -1),
     statementList = statement ^ -1 * (sep.statement * statementList) ^ -1 / nodeStatementSequence,
     blockStatement = delim.openBlock * statementList * sep.statement ^ -1 * delim.closeBlock / nodeBlock,
-    elses = ((KW "elseif" + KW(translator.kwords.longForm.keyElseIf) + KW(translator.kwords.shortForm.keyElseIf)) *
-        expression *
-        blockStatement) *
-        elses /
-        nodeIf +
-        ((KW "else" + KW(translator.kwords.longForm.keyElse) + KW(translator.kwords.shortForm.keyElse)) * blockStatement) ^
-            -1,
+    elses = (KW_elseif * expression * blockStatement) * elses / nodeIf + (KW_else * blockStatement) ^ -1,
     variable = identifier / nodeVariable,
     functionCall = identifier * delim.openFunctionParameterList * funcArgs * delim.closeFunctionParameterList /
         nodeFunctionCall,
@@ -276,38 +282,20 @@ local grammar = {
     writeTarget = Ct(variable * (delim.openArray * expression * delim.closeArray) ^ 0) / foldArrayElement,
     statement = blockStatement + functionCall +
         writeTarget * (op.assign * expression) ^ -1 * -delim.openBlock / nodeAssignment +
-        (KW "local" + KW(translator.kwords.longForm.keyLocal) + KW(translator.kwords.shortForm.keyLocal)) * identifier *
-            (op.assign * expression) ^ -1 /
-            nodeLocalVariable +
-        (KW "if" + KW(translator.kwords.longForm.keyIf) + KW(translator.kwords.shortForm.keyIf)) * expression *
-            blockStatement *
-            elses /
-            nodeIf +
-        (KW "return" + KW(translator.kwords.longForm.keyReturn) + KW(translator.kwords.shortForm.keyReturn)) *
-            expression /
-            nodeReturn +
-        (KW "while" + KW(translator.kwords.longForm.keyWhile) + KW(translator.kwords.shortForm.keyWhile)) * expression *
-            blockStatement /
-            nodeWhile +
-        (op.print + KW(translator.kwords.longForm.keyPrint) + KW(translator.kwords.shortForm.keyPrint)) * expression /
-            nodePrint +
-        (op.exec) * expression / nodeExec,
-    boolean = ((KW "true" + KW(translator.values.longForm.valTrue) + KW(translator.values.shortForm.valTrue)) * Cc(true) +
-        (KW "false" + KW(translator.values.longForm.valFalse) + KW(translator.values.shortForm.valFalse)) * Cc(false)) /
-        nodeBoolean,
-    primary = Ct(
-        (KW "new" + KW(translator.kwords.longForm.keyNew) + KW(translator.kwords.shortForm.keyNew)) *
-            (delim.openArray * expression * delim.closeArray) ^ 1
-    ) *
-        primary /
-        foldNewArray +
-        functionCall +
+        KW_local * identifier * (op.assign * expression) ^ -1 / nodeLocalVariable +
+        KW_if * expression * blockStatement * elses / nodeIf +
+        KW_return * expression / nodeReturn +
+        KW_while * expression * blockStatement / nodeWhile +
+        kW_print * expression / nodePrint +
+        KW_exec * expression / nodeExec,
+    boolean = (KW_true * Cc(true) + KW_false * Cc(false)) / nodeBoolean,
+    primary = Ct(KW_new * (delim.openArray * expression * delim.closeArray) ^ 1) * primary / foldNewArray + functionCall +
         writeTarget +
         stringLiteral / nodeString +
         numeral / nodeNumeral +
         boolean +
-        (op.exec) * expression / nodeExec +
-        (KW "nil" + KW(translator.values.longForm.valNil) + KW(translator.values.shortForm.valNil)) / nodeNil +
+        KW_exec * expression / nodeExec +
+        KW_nil / nodeNil +
         delim.openFactor * expression * delim.closeFactor,
     exponentExpr = primary * (op.exponent * exponentExpr) ^ -1 / addExponentOp,
     unaryExpr = op.unarySign * unaryExpr / addUnaryOp + exponentExpr,
