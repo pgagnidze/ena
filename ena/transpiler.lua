@@ -120,7 +120,7 @@ local handlers = {
         return node.value
     end,
     ["string"] = function(transpiler, node, indentLevel, indent)
-        -- TODO: replace \ with \\ and " with \"
+        node.value = string.gsub(node.value, "\\", "\\\\")
         return '"' .. node.value .. '"'
     end,
     ["nil"] = function(transpiler, node, indentLevel, indent)
@@ -151,9 +151,14 @@ local handlers = {
             op = "or"
         elseif op == "!=" then
             op = "~="
-        elseif op == "+" then -- TODO: handle variables that can be strings or numbers
-            if node.firstChild.tag == "string" or node.secondChild.tag == "string" then
-                op = ".."
+        elseif op == "+" then
+            -- Check if either operand is a string or a variable
+            if node.firstChild.tag == "string" or node.firstChild.tag == "variable" or
+               node.secondChild.tag == "string" or node.secondChild.tag == "variable" then
+                -- Generate code that checks the type of the operands at runtime
+                return "(function() local a = " .. transpiler:transpile(node.firstChild, indentLevel) .. 
+                       "; local b = " .. transpiler:transpile(node.secondChild, indentLevel) .. 
+                       "; if type(a) == 'string' or type(b) == 'string' then return a .. b else return a + b end end)()"
             end
         end
         return transpiler:transpile(node.firstChild, indentLevel) ..
