@@ -171,7 +171,6 @@ local nodeNil = node("nil")
 local nodeWhile = node("while", "expression", "block")
 local nodeFunction = node("function", "name", "params", "defaultArgument", "block")
 local nodeFunctionCall = node("functionCall", "name", "args")
-local nodeBlock = node("block", "body")
 local nodeLocalVariable = node("local", "name", "init")
 local nodeString = node("string", "value")
 
@@ -190,6 +189,14 @@ local function nodeStatementSequence(first, rest)
         return rest
     else
         return {tag = "statementSequence", firstChild = first, secondChild = rest}
+    end
+end
+
+local function nodeBlock(body)
+    if body == "" then
+        return {tag = "emptyBlock"}
+    else
+        return {tag = "block", body = body}
     end
 end
 
@@ -269,11 +276,11 @@ local grammar = {
     funcDec = KW_function * identifier * delim.openFunctionParameterList * funcParams *
         ((op.assign * expression) + Cc({})) *
         delim.closeFunctionParameterList *
-        (blockStatement + sep.statement) /
+        (blockStatement + sep.statement ^ -1) /
         nodeFunction,
     funcParams = Ct((identifier * (delim.functionParameterSeparator * identifier) ^ 0) ^ -1),
-    statementList = statement ^ -1 * (sep.statement * statementList) ^ -1 / nodeStatementSequence,
-    blockStatement = delim.openBlock * statementList * sep.statement ^ -1 * delim.closeBlock / nodeBlock,
+    statementList = statement * (sep.statement ^ -1 * statementList) ^ -1 / nodeStatementSequence,
+    blockStatement = delim.openBlock * (statementList ^ -1 / nodeBlock) * sep.statement ^ -1 * delim.closeBlock,
     elses = (KW_elseif * expression * blockStatement) * elses / nodeIf + (KW_else * blockStatement) ^ -1,
     variable = identifier / nodeVariable,
     functionCall = identifier * delim.openFunctionParameterList * funcArgs * delim.closeFunctionParameterList /

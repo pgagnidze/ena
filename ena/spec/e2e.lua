@@ -26,7 +26,7 @@ end
 function module:testIdentifiers()
     local tests = {
         {input = "_leading_underscore", expected = 1},
-        {input = "has spaces", expected = "Parsing failed"},
+        {input = "has spaces", expected = nil},
         {input = "has-hyphens", expected = "Parsing failed"},
         {input = "წერე_ქართულად", expected = 1},
         {input = "0not valid", expected = "Parsing failed"}
@@ -197,7 +197,7 @@ function module:testAssignmentAndReturn()
 end
 
 function module:testEmptyStatements()
-    lu.assertEquals(self:endToEnd(";;;;", true), nil)
+    lu.assertEquals(self:endToEnd(";;;;", true), "Parsing failed")
 end
 
 function module:testEmptyInput()
@@ -486,5 +486,32 @@ function module:testShellExec()
         "Hello World"
     )
 end
+
+function module:testOptionalStatementSeparator()
+    lu.assertEquals(
+        self:endToEnd(
+            [[
+            function main() {
+                a = 20
+                b = a
+                array = new [2][2] 1
+                array[1][1] = 0
+                test = 0
+                test = test && array[1][2]
+                test = test && array[2][1]
+                test = test && array[2][2]
+                if test {
+                } elseif b > a {
+                } else {
+                };
+                return b
+            }
+            ]]
+        ),
+        20
+    )
+end
+
+
 
 return module

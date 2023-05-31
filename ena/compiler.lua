@@ -241,6 +241,8 @@ end
 function Compiler:codeStatement(ast)
     if ast.tag == "emptyStatement" then
         return
+    elseif ast.tag == "emptyBlock" then
+        return
     elseif ast.tag == "block" then
         self:codeBlock(ast)
     elseif ast.tag == "statementSequence" then
