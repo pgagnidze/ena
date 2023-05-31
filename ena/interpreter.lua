@@ -187,7 +187,11 @@ function Interpreter:run(code)
             self.stack[self.top] = -self.stack[self.top]
         elseif code[pc] == "not" then
             self:traceUnaryOp(code[pc])
-            self.stack[self.top] = not self.stack[self.top]
+            if self.stack[self.top] == 0 then
+                self.stack[self.top] = true
+            else
+                self.stack[self.top] = not self.stack[self.top]
+            end
         elseif code[pc] == "load" then
             self:traceTwoCodes(code, pc)
             self.top = self.top + 1

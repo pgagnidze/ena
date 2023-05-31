@@ -534,4 +534,31 @@ function module:testFunctionOrdering()
     )
 end
 
+function module:testFalseValues()
+    lu.assertEquals(
+        self:endToEnd(
+            [[
+            function a() {
+                if !false {
+                    return 1
+                }
+            }
+
+            function main() {
+                if !0 {
+                    return a() + b()
+                }
+            }
+            
+            function b() {
+                if !nil {
+                    return 2
+                }
+            }
+            ]]
+        ),
+        3
+    )
+end
+
 return module
