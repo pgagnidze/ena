@@ -512,6 +512,26 @@ function module:testOptionalStatementSeparator()
     )
 end
 
+function module:testFunctionOrdering()
+    lu.assertEquals(
+        self:endToEnd(
+            [[
 
+            function a() {
+                return 1
+            }
+
+            function main() {
+                return a() + b()
+            }
+            
+            function b() {
+                return 2
+            }
+            ]]
+        ),
+        3
+    )
+end
 
 return module

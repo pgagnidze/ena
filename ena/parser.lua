@@ -276,7 +276,7 @@ local grammar = {
     funcDec = KW_function * identifier * delim.openFunctionParameterList * funcParams *
         ((op.assign * expression) + Cc({})) *
         delim.closeFunctionParameterList *
-        (blockStatement + sep.statement ^ -1) /
+        blockStatement /
         nodeFunction,
     funcParams = Ct((identifier * (delim.functionParameterSeparator * identifier) ^ 0) ^ -1),
     statementList = statement * (sep.statement ^ -1 * statementList) ^ -1 / nodeStatementSequence,

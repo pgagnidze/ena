@@ -61,8 +61,9 @@ Execute the [input.ena](./example/input.ena) for the input program. `input.ena` 
 
 Check out the new [sysinfo.ena](./example/sysinfo.ena) program that shows various system informations for Linux and Darwin os.
 
-**Summary of changes:**
-- optional statement separator (;)
+**Summary of modifications:**
+- Optional statement separator (;)
+- Scan the entire AST and collect function names (instead of forward declarations)
 
 ## New Features
 

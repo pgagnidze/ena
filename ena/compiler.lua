@@ -1,6 +1,7 @@
 local module = {}
 local translator = require "ena.lang.translator"
 local literals = require "ena.lang.literals"
+local pt = require "ena.helper.pt".pt
 local lop = literals.op
 
 local Compiler = {}
@@ -327,19 +328,7 @@ function Compiler:findFirstDuplicateParam(ast)
 end
 
 function Compiler:codeFunction(ast)
-    if not ast.block then
-        if not self.functions[ast.name] then
-            self.functions[ast.name] = {code = {}, forwardDeclaration = true}
-        end
-    end
-    local functionCode = self.functions[ast.name] and self.functions[ast.name].code or {}
-    if #functionCode > 0 and not self.functions[ast.name].forwardDeclaration then
-        error(
-            (self.translate and translator.err.compileErrDuplicateFunctionName or "Duplicate function name") ..
-                ' "' .. ast.name .. '()"'
-        )
-    end
-    self.functions[ast.name] = {code = functionCode, params = ast.params, defaultArgument = ast.defaultArgument}
+    local functionCode = self.functions[ast.name].code
     self.code = functionCode
     self.params = ast.params
     local firstDuplicate = self:findFirstDuplicateParam(ast)
@@ -357,7 +346,20 @@ function Compiler:codeFunction(ast)
     end
 end
 
+function Compiler:collectFunctions(ast)
+    for i = 1, #ast do
+        local functionDeclaration = ast[i]
+        if not self.functions[functionDeclaration.name] then
+            self.functions[functionDeclaration.name] = {code = {}, params = functionDeclaration.params, defaultArgument = functionDeclaration.defaultArgument}
+        else
+            error("Duplicate function name '" .. functionDeclaration.name .. "()'")
+        end
+    end
+end
+
 function Compiler:compile(ast)
+    self:collectFunctions(ast)
+
     for i = 1, #ast do
         self:codeFunction(ast[i])
     end
