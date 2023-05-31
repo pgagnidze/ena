@@ -66,7 +66,7 @@ Check out the new [sysinfo.ena](./example/sysinfo.ena) program that shows variou
 The design choices remain consistent with the principles discussed in the lectures and exercises,
 adhering to established best practices and prioritizing simplicity in the syntax of common programming languages.
 
-An additional feature is the transpiler option, which allows for the conversion of Ena code into Lua code.
+An additional feature is the transpiler option (for testing only, functionality is not fully developed and may be inconsistent.), which allows for the conversion of Ena code into Lua code.
 This enables users to visualize how the Ena code would appear in widely recognized programming languages.
 Additionally, the Lua code can be further transpiled into languages such as Python, Typescript, and more.
 
@@ -97,7 +97,7 @@ options are:
 | --trace | -t | Trace the program. |
 | --result | -r | Show the result. |
 | --pegdebug | -p | Run the PEG debugger. |
-| --transpile | -tp | Transpile to Lua. |
+| --transpile | -tp | Transpile to Lua. (experimental) |
 | --translate | -tr | Translate messages to Georgian. |
 
 For example:
@@ -150,7 +150,7 @@ Check out the [Issues](https://github.com/pgagnidze/ena/issues) for more details
 - Added the CI/CD for the tests to ensure stability and quality.
 - Developed a CLI (Command-Line Interface) tool that offers convenient options for users to interact with the project.
 - Created a syntax highlighter specifically for Visual Studio Code, enhancing the code editing experience for users working with the project.
-- Implemented the transpiler option, allowing the conversion of Ena code into Lua code, which enables users to evaluate and utilize the code in a more established programming language.
+- Implemented the transpiler option (experimental), allowing the conversion of Ena code into Lua code, which enables users to evaluate and utilize the code in a more established programming language.
 
 ## References
 

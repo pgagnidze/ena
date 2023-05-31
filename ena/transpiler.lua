@@ -1,3 +1,9 @@
+--[[
+    This transpiler is experimental. It supports the following AST nodes:
+    - function, functionCall, block, if, while, arrayElement, newArray, statementSequence, assignment, local
+    - boolean, number, string, nil, print, exec, variable, emptyStatement, binaryOp, unaryOp, return
+]]
+
 local module = {}
 local Transpiler = {}
 local translator = require "ena.lang.translator"
@@ -78,20 +84,14 @@ local handlers = {
         local index = transpiler:transpile(node.index, indentLevel)
         return array .. "[" .. index .. "]"
     end,
+    -- We use 'size' as a string expression to dynamically determine the size of the table
+    -- We use a metatable to provide a default value for all indices up to size
+    -- Note: This assumes that 'size' is a valid Lua expression and that it evaluates to a number
     ["newArray"] = function(transpiler, node, indentLevel, indent)
         local size = transpiler:transpile(node.size, indentLevel)
         local initialValue = transpiler:transpile(node.initialValue, indentLevel)
         if type(size) == "string" then
-            -- We use 'size' as a string expression to dynamically determine the size of the table
-            -- We use a metatable to provide a default value for all indices up to size
-            -- Note: This assumes that 'size' is a valid Lua expression and that it evaluates to a number
-            return "(function()\n" ..
-                indent .. "    local t = setmetatable({}, {__index = function() return " .. initialValue .. " end})\n" ..
-                indent .. "    for i = 1, " .. size .. " do\n" ..
-                indent .. "        t[i] = " .. initialValue .. "\n" ..
-                indent .. "    end\n" ..
-                indent .. "    return t\n" ..
-                indent .. "end)()"
+            return "newArray(" .. size .. ", " .. initialValue .. ")"
         end
         local arrayElements = {}
         for _ = 1, size do
@@ -130,12 +130,8 @@ local handlers = {
         return indent .. "print(" .. transpiler:transpile(node.toPrint, indentLevel) .. ")"
     end,
     ["exec"] = function(transpiler, node, indentLevel, indent)
-        return "(function()\n" ..
-            indent .. '    local command = ' .. transpiler:transpile(node.command, indentLevel) .. '\n' ..
-            indent .. '    local file = assert(io.popen(command, "r"), "failed to execute command " .. command)\n' ..
-            indent .. '    local output = file:read("*all")\n' ..
-            indent .. '    return string.gsub(output, "^%s*(.-)%s*$", "%1")\n' ..
-            indent .. "end)()"
+        local command = transpiler:transpile(node.command, indentLevel)
+        return "exec(" .. command .. ")"
     end,
     ["variable"] = function(transpiler, node, indentLevel, indent)
         return node.value
@@ -155,10 +151,20 @@ local handlers = {
             -- Check if either operand is a string or a variable
             if node.firstChild.tag == "string" or node.firstChild.tag == "variable" or
                node.secondChild.tag == "string" or node.secondChild.tag == "variable" then
-                -- Generate code that checks the type of the operands at runtime
-                return "(function() local a = " .. transpiler:transpile(node.firstChild, indentLevel) .. 
-                       "; local b = " .. transpiler:transpile(node.secondChild, indentLevel) .. 
-                       "; if type(a) == 'string' or type(b) == 'string' then return a .. b else return a + b end end)()"
+                -- Traverse the binary tree to collect all the operands of + operations
+                local args = {}
+                local stack = {node}
+                while #stack > 0 do
+                    local current = table.remove(stack)
+                    if current.tag == "binaryOp" and current.op == "+" then
+                        table.insert(stack, current.firstChild)
+                        table.insert(stack, current.secondChild)
+                    else
+                        table.insert(args, 1, transpiler:transpile(current, indentLevel))
+                    end
+                end
+                -- Join the operands together in a single call to addOrConcat
+                return "addOrConcat(" .. table.concat(args, ", ") .. ")"
             end
         end
         return transpiler:transpile(node.firstChild, indentLevel) ..
@@ -200,15 +206,52 @@ end
 function module.transpile(ast)
     local transpiler = Transpiler:new()
     local luaCodeParts = {}
+    table.insert(
+        luaCodeParts,
+        [[
+function newArray(size, initialValue)
+    local t = setmetatable({}, {__index = function() return initialValue end})
+    for i = 1, size do
+        t[i] = initialValue
+    end
+    return t
+end
+
+function exec(command)
+    local file = assert(io.popen(command, "r"), "failed to execute command " .. command)
+    local output = file:read("*all")
+    return string.gsub(output, "^%s*(.-)%s*$", "%1")
+end
+
+function addOrConcat(...)
+    local args = {...}
+    local result = args[1]
+    for i = 2, #args do
+        if type(result) == 'string' or type(args[i]) == 'string' then
+            result = result .. args[i]
+        else
+            result = result + args[i]
+        end
+    end
+    return result
+end
+
+]]
+    )
     for _, node in ipairs(ast) do
         table.insert(luaCodeParts, transpiler:transpile(node))
     end
-    table.insert(luaCodeParts, "\nmain()")
+    table.insert(luaCodeParts, [[
+
+main()
+
+-- EXPERIMENTAL: This transpiler is for testing only. Functionality is not fully developed and may be inconsistent. --
+
+]])
     local luaCode = table.concat(luaCodeParts, "")
     local georgianCharacters = replaceGeorgianCharacters(luaCode)
     local replacedMain = string.gsub(georgianCharacters, "mthavari", "main")
     return replacedMain
-
 end
 
 return module

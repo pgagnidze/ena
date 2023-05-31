@@ -160,12 +160,12 @@ if show.result then
     io.stdout:write((show.translate and translator.success.showResult or "Result") .. ":\n", tostring(result), "\n\n")
 end
 
--- transpile --
+-- transpile: experimental --
 if show.transpile then
     local transpiledCode = transpiler.transpile(ast)
     io.stdout:write(
-        (show.transpile and translator.success.showTranspile or "Transpiled") .. ":\n",
+        (show.translate and translator.success.showTranspile or "Transpiled") .. ":\n",
         tostring(transpiledCode),
-        "\n\n"
+        "\n"
     )
 end
