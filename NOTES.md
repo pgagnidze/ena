@@ -64,6 +64,7 @@ Check out the new [sysinfo.ena](./example/sysinfo.ena) program that shows variou
 **Summary of modifications:**
 - Optional statement separator (;)
 - Scan the entire AST and collect function names (instead of forward declarations)
+- false, nil and 0 are falsy values
 
 ## New Features
 
