@@ -60,6 +60,8 @@ You can check the [tests](./ena/spec/e2e.lua) for more examples. You can run all
 Execute the [input.ena](./example/input.ena) for the input program. `input.ena` has comments to explain the syntax briefly.
 
 Check out the new [sysinfo.ena](./example/sysinfo.ena) program that shows various system informations for Linux and Darwin os.
+                                                                       
+Check out the [Wiki](https://github.com/pgagnidze/ena/wiki/Enadoc) for more details about the Ena syntax.
 
 **Summary of modifications:**
 - Optional statement separator (;)
