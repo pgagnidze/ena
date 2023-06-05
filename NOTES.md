@@ -61,7 +61,7 @@ Execute the [input.ena](./example/input.ena) for the input program. `input.ena` 
 
 Check out the new [sysinfo.ena](./example/sysinfo.ena) program that shows various system informations for Linux and Darwin os.
                                                                        
-Check out the [Wiki](https://github.com/pgagnidze/ena/wiki/Documentation) for more details about the Ena syntax.
+Check out the [Wiki](https://github.com/pgagnidze/ena/wiki) for more details about the Ena syntax.
 
 **Summary of modifications:**
 - Optional statement separator (;)
