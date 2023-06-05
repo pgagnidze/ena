@@ -8,6 +8,53 @@
 
 This language aims to make programming more accessible for Georgians by allowing them to write code in their native language.
 Ena uses the syntax of popular, widely-used languages, modified to use the Georgian alphabet and keywords.
+                                                                       
+### Installation
+1. Install [Lua](https://www.lua.org/start.html#installing) and [LuaRocks](https://github.com/luarocks/luarocks/wiki/Download)
+2. Install Ena with LuaRocks - `$ luarocks install ena`
+3. (optional) Install VS Code [Extension](https://marketplace.visualstudio.com/items?itemName=pgagnidze.ena) for syntax highlighting
+
+### Usage
+We can run Ena with:
+
+`$ ena -i [filename] [options]`
+
+options are:
+
+| Option | Short form | Description |
+|--------|------------|-------------|
+| --help | -h | Show this help message. |
+| --input | -i | Specify the input file. |
+| --ast | -a | Show abstract syntax tree. |
+| --code | -c | Show generated code. |
+| --trace | -t | Trace the program. |
+| --result | -r | Show the result. |
+| --pegdebug | -p | Run the PEG debugger. |
+| --transpile | -tp | Transpile to Lua. (experimental) |
+| --translate | -tr | Translate messages to Georgian. |
+
+For example:
+`$ ena --result --transpile -i example/example.ena`
+
+```
+Result:
+720
+
+Transpiled:
+function faqtoriali(n)
+    n = n or 6
+    if n ~= 0 then
+        return n * faqtoriali(n - 1)
+    else
+        return 1
+    end
+end
+function main()
+    return faqtoriali()
+end
+
+main()
+```
 
 ## Language Syntax
 
@@ -82,53 +129,6 @@ In addition to the transpiler capability, I have introduced several new features
 - Abscence of value (nil)
 - String literals (with concatenation, use `+` sign)
 - Shell execution (with `$` operator)
-
-## Installation
-1. Install [Lua](https://www.lua.org/start.html#installing) and [LuaRocks](https://github.com/luarocks/luarocks/wiki/Download)
-2. Install Ena with LuaRocks - `$ luarocks install ena`
-3. (optional) Install VS Code [Extension](https://marketplace.visualstudio.com/items?itemName=pgagnidze.ena) for syntax highlighting
-
-## Usage
-We can run Ena with:
-
-`$ ena -i [filename] [options]`
-
-options are:
-
-| Option | Short form | Description |
-|--------|------------|-------------|
-| --help | -h | Show this help message. |
-| --input | -i | Specify the input file. |
-| --ast | -a | Show abstract syntax tree. |
-| --code | -c | Show generated code. |
-| --trace | -t | Trace the program. |
-| --result | -r | Show the result. |
-| --pegdebug | -p | Run the PEG debugger. |
-| --transpile | -tp | Transpile to Lua. (experimental) |
-| --translate | -tr | Translate messages to Georgian. |
-
-For example:
-`$ ena --result --transpile -i example/example.ena`
-
-```
-Result:
-720
-
-Transpiled:
-function faqtoriali(n)
-    n = n or 6
-    if n ~= 0 then
-        return n * faqtoriali(n - 1)
-    else
-        return 1
-    end
-end
-function main()
-    return faqtoriali()
-end
-
-main()
-```
 
 ## Future
 > What would be needed to get this project ready for production?
