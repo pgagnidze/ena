@@ -139,7 +139,7 @@ tokens.op.unarySign = T(C(P(l.op.positive) + l.op.negate))
 tokens.op.not_ = T(C(l.op.not_))
 tokens.op.print = T(l.op.print)
 tokens.op.exec = T(l.op.exec)
-tokens.op.logical = T(C(l.op.and_) + C(l.op.or_) + C(l.op.and_geo) + C(l.op.or_geo))
+tokens.op.logical = T(C(l.op.and_) + C(l.op.or_))
 
 local op = tokens.op
 local sep = tokens.sep

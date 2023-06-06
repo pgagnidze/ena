@@ -24,8 +24,6 @@ module.op.equal = "=="
 module.op.notEqual = "!="
 module.op.and_ = "&&"
 module.op.or_ = "||"
-module.op.and_geo = "და"
-module.op.or_geo = "ან"
 
 -- unary operators --
 module.op.not_ = "!"
