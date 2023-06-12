@@ -10,28 +10,33 @@ function Interpreter:new(o)
         {
             stack = {},
             top = 0,
-            memory = {}
+            memory = {},
+            output = {}
         }
     self.__index = self
     setmetatable(o, self)
     return o
 end
 
-local function printValue(array, depth, pad, last, visited)
+local function printValue(array, depth, pad, last, visited, output)
     visited = visited or {}
+    local function write(value)
+        table.insert(output, tostring(value))
+        io.write(tostring(value))
+    end
     if pad == nil then
         pad = 0
-        printValue(array, depth, pad, last, visited)
+        printValue(array, depth, pad, last, visited, output)
         return
     end
 
     if type(array) ~= "table" then
-        io.write(tostring(array))
+        write(array)
         return
     end
 
     if visited[array] then
-        io.write("<selfrefer>")
+        write("<selfrefer>")
         return
     end
 
@@ -39,23 +44,23 @@ local function printValue(array, depth, pad, last, visited)
 
     depth = depth or 0
     if depth > 0 then
-        io.write("\n")
+        write("\n")
     end
-    io.write((" "):rep(depth) .. "[")
+    write((" "):rep(depth) .. "[")
 
     for i = 1, #array - 1 do
-        printValue(array[i], depth + 1, pad, false, visited)
-        io.write(",")
+        printValue(array[i], depth + 1, pad, false, visited, output)
+        write(",")
         if type(array[i]) ~= "table" then
-            io.write(" ")
+            write(" ")
         end
     end
-    printValue(array[#array], depth + 1, pad, true, visited)
+    printValue(array[#array], depth + 1, pad, true, visited, output)
 
-    io.write("]")
+    write("]")
 
     if last then
-        io.write("\n" .. (" "):rep(depth - 1))
+        write("\n" .. (" "):rep(depth - 1))
     end
 end
 
@@ -284,7 +289,7 @@ function Interpreter:run(code)
             end
         elseif code[pc] == "print" then
             self:traceUnaryOp(code[pc])
-            printValue(self.stack[self.top])
+            printValue(self.stack[self.top], nil, nil, nil, nil, self.output)
             io.write "\n"
             self:popStack(1)
         elseif code[pc] == "return" then
@@ -333,7 +338,7 @@ function module.execute(code, trace, translate)
     trace.stack = {}
     interpreter.trace = trace
     interpreter.translate = translate
-    return interpreter:execute(code)
+    return interpreter:execute(code), interpreter.output
 end
 
 return module
