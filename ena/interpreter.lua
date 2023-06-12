@@ -290,6 +290,7 @@ function Interpreter:run(code)
         elseif code[pc] == "print" then
             self:traceUnaryOp(code[pc])
             printValue(self.stack[self.top], nil, nil, nil, nil, self.output)
+            table.insert(self.output, "\n")
             io.write "\n"
             self:popStack(1)
         elseif code[pc] == "return" then
