@@ -1,6 +1,6 @@
-![test status](https://github.com/pgagnidze/ena/workflows/test/badge.svg)
-
 # Final Project Report: Ena
+
+![test status](https://github.com/pgagnidze/ena/workflows/test/badge.svg)
 
 <p align="center">
   <img src="./example/example.png" alt="Example Ena Image" width="60%"">
@@ -8,13 +8,15 @@
 
 This language aims to make programming more accessible for Georgians by allowing them to write code in their native language.
 Ena uses the syntax of popular, widely-used languages, modified to use the Georgian alphabet and keywords.
-                                                                       
+
 ### Installation
+
 1. Install [Lua](https://www.lua.org/start.html#installing) and [LuaRocks](https://github.com/luarocks/luarocks/wiki/Download)
 2. Install Ena with LuaRocks - `$ luarocks install ena`
 3. (optional) Install VS Code [Extension](https://marketplace.visualstudio.com/items?itemName=pgagnidze.ena) for syntax highlighting
 
 ### Usage
+
 We can run Ena with:
 
 `$ ena -i [filename] [options]`
@@ -36,7 +38,7 @@ options are:
 For example:
 `$ ena --result --transpile -i example/example.ena`
 
-```
+```text
 Result:
 720
 
@@ -72,7 +74,7 @@ I allowed the use of English keywords and syntax to simplify the evaluation proc
       <code>
 function factorial(n = 6) {
     if n != 0 {
-        return n * factorial(n - 1)
+        return n *factorial(n - 1)
     } else {
         return 1
     }
@@ -88,7 +90,7 @@ function main() {
   <code>
 ფუნქცია ფაქტორიალი(ნ = 6) {
     თუ ნ != 0 {
-        დააბრუნე ნ * ფაქტორიალი(ნ - 1)
+დააბრუნე ნ* ფაქტორიალი(ნ - 1)
     } თუარა {
         დააბრუნე 1
     }
@@ -107,10 +109,11 @@ You can check the [tests](./ena/spec/e2e.lua) for more examples. You can run all
 Execute the [input.ena](./example/input.ena) for the input program. `input.ena` has comments to explain the syntax briefly.
 
 Check out the new [sysinfo.ena](./example/sysinfo.ena) program that shows various system informations for Linux and Darwin os.
-                                                                       
+
 Check out the [Wiki](https://github.com/pgagnidze/ena/wiki) for more details about the Ena syntax.
 
 **Summary of modifications:**
+
 - Optional statement separator (;)
 - Scan the entire AST and collect function names (instead of forward declarations)
 - false, nil and 0 are falsy values
@@ -125,12 +128,14 @@ This enables users to visualize how the Ena code would appear in widely recogniz
 Additionally, the Lua code can be further transpiled into languages such as Python, Typescript, and more.
 
 In addition to the transpiler capability, I have introduced several new features to the system:
+
 - Booleans,
 - Abscence of value (nil)
 - String literals (with concatenation, use `+` sign)
 - Shell execution (with `$` operator)
 
 ## Future
+>
 > What would be needed to get this project ready for production?
 
 To prepare this project for production, I would add modules, for loops, and dictionaries.
@@ -146,6 +151,7 @@ Simultaneously, I would ensure that the language remains approachable for learni
 Check out the [Issues](https://github.com/pgagnidze/ena/issues) for more details about the Ena roadmap.
 
 ## Self assessment
+
 | Criteria | Score |
 | -------- | -------- |
 | Language Completeness  | 2  |
@@ -153,6 +159,7 @@ Check out the [Issues](https://github.com/pgagnidze/ena/issues) for more details
 | Originality & Scope| 2  |
 
 > Have you gone beyond the base requirements? How so?
+
 - Made the project available on Luarocks, a package manager for Lua, which simplifies the installation process for users.
 - Added the CI/CD for the tests to ensure stability and quality.
 - Developed a CLI (Command-Line Interface) tool that offers convenient options for users to interact with the project.
