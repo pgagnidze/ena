@@ -1,0 +1,11 @@
+FROM ubuntu:22.04
+
+WORKDIR /app
+
+COPY . /app
+
+RUN apt-get update \
+    && apt-get install -y git lua5.1 luarocks \
+    && luarocks make luarocks/ena-0.0.2-2.rockspec
+
+RUN ena --tests
