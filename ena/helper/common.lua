@@ -1,4 +1,3 @@
----@diagnostic disable: duplicate-set-field
 local common = {}
 local lpeg = require "lpeg"
 local literals = require "ena.lang.literals"
@@ -9,6 +8,7 @@ local V = lpeg.V
 common.endToken = V "endToken"
 
 if not table.pack then
+    ---@diagnostic disable: duplicate-set-field
     function common.tablePack(...)
         return { n = select('#', ...), ... }
     end

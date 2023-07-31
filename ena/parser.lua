@@ -156,7 +156,9 @@ local function node(tag, ...)
     local params = table.concat(labels, ", ")
     local fields = string.gsub(params, "(%w+)", "%1 = %1")
     local code = string.format("return function (%s) return {tag = '%s', %s} end", params, tag, fields)
-    return assert(load(code))()
+---@diagnostic disable-next-line: deprecated
+    local loadFunc = loadstring or load
+    return assert(loadFunc(code))()
 end
 
 local nodeVariable = node("variable", "value")
