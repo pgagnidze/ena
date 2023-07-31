@@ -152,7 +152,7 @@ local stringLiteral = doubleQuoteString + singleQuoteString
 
 -- abstract syntax tree --
 local function node(tag, ...)
-    local labels = table.pack(...)
+    local labels = common.tablePack(...)
     local params = table.concat(labels, ", ")
     local fields = string.gsub(params, "(%w+)", "%1 = %1")
     local code = string.format("return function (%s) return {tag = '%s', %s} end", params, tag, fields)

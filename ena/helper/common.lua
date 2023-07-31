@@ -1,3 +1,4 @@
+---@diagnostic disable: duplicate-set-field
 local common = {}
 local lpeg = require "lpeg"
 local literals = require "ena.lang.literals"
@@ -6,6 +7,14 @@ local P = lpeg.P
 local V = lpeg.V
 
 common.endToken = V "endToken"
+
+if not table.pack then
+    function common.tablePack(...)
+        return { n = select('#', ...), ... }
+    end
+else
+    common.tablePack = table.pack
+end
 
 function common.I(tag)
     return P(
