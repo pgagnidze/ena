@@ -20,6 +20,12 @@
 
 ენა ლიცენზირებულია GPL-3.0 ლიცენზიით. დამატებითი ინფორმაცია იხილეთ [LICENSE](https://github.com/pgagnidze/ena/blob/main/LICENSE) ფაილში.
 
+## პრესა
+
+[Entrepreneur Georgia](https://www.entrepreneur.com/ka/siakhleebi-da-tendentsiebi/programireba/455701)
+
+[dev.ge](https://dev.ge/news/rogor-mushaobs-programirebis-kartuli-ena-interviu-mis-shemkmneltan-papuna-gagnidzestan)
+
 ## ♥
 
 - Roberto Ierusalimschy-ის პროგრამირების ენის შემსწავლელი კურსის საბოლოო პროექტი ([Report](./NOTES.md))
