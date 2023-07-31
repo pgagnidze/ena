@@ -8,7 +8,7 @@ local V = lpeg.V
 common.endToken = V "endToken"
 
 if not table.pack then
-    ---@diagnostic disable: duplicate-set-field
+    ---@diagnostic disable-next-line: duplicate-set-field
     function common.tablePack(...)
         return { n = select('#', ...), ... }
     end
