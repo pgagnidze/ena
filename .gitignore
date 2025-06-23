@@ -41,3 +41,5 @@ luac.out
 
 .DS_Store
 example/localtest.*.ena
+CLAUDE.local.md
+**/.claude/settings.local.json
